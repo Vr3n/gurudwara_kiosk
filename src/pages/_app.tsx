@@ -11,10 +11,14 @@ const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
+  const getLayout =
+    //@ts-expect-error Any returned as Component Layout cannot pe added.
+    (Component?.getLayout as unknown) ?? ((page: unknown) => page);
+
   return (
     <SessionProvider session={session}>
       <Head>
-        <title>Sikh</title>
+        <title>Sikh Society, Calgary</title>
         <meta name="description" content="Sikh Society calgary kiosk." />
         <link
           rel="apple-touch-icon"
@@ -38,7 +42,10 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
-      <Component {...pageProps} />
+      {
+        // @ts-expect-error The get Layout error.
+        getLayout(<Component {...pageProps} />)
+      }
     </SessionProvider>
   );
 };
