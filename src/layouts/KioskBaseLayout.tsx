@@ -66,6 +66,7 @@ const KioskBaseLayout = ({
         <footer className="flex justify-between">
           {navButtons.map((btn) => (
             <KioskButton
+              key={btn.href}
               href={btn.href}
               text={btn.text}
               type={btn.type}
