@@ -1,5 +1,14 @@
+import AdminBaseLayout from "~/layouts/AdminBaseLayout";
+
 const AdminHome = () => {
-  return <h1 className="text-4xl font-bold">Hello, Admin!</h1>;
+  return (
+    <>
+      <p className="text-4xl font-bold">Hello, Friend!</p>
+    </>
+  );
 };
+
+// eslint-disable-next-line
+AdminHome.getLayout = (page: any) => <AdminBaseLayout>{page}</AdminBaseLayout>;
 
 export default AdminHome;
