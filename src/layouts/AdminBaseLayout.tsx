@@ -25,7 +25,7 @@ const AdminBaseLayout = ({ children }: AdminBaseLayoutProps) => {
       <AdminNavbar sidebarToggleFunc={toggleSidebarVisibility} />
       <span className="flex gap-4">
         <AdminSidebar
-          className={cn("hidden", isSidebarVisible ? "md:block" : null)}
+          className={cn("hidden", isSidebarVisible ? "block" : null)}
         />
         <main className="p-4">{children}</main>
       </span>
