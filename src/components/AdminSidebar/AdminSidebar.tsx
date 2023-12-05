@@ -1,14 +1,9 @@
 import Link from "next/link";
 import { Button } from "../ui/button";
-import {
-  HouseLine,
-  Synagogue,
-  MapPin,
-  BookBookmark,
-  Barcode,
-  type Icon as PhosIcon,
-} from "@phosphor-icons/react";
+import { DotOutline, type Icon as PhosIcon } from "@phosphor-icons/react";
 import { cn } from "~/lib/utils";
+import { type HTMLAttributes } from "react";
+import { usePathname } from "next/navigation";
 
 export type LinkButtonsProps = {
   href: string;
@@ -36,32 +31,35 @@ const LinkButtons = ({
   );
 };
 
-type AdminSidebarProps = {
+export type AdminSidebarProps = {
+  items: {
+    href: string;
+    title: string;
+    Icon?: PhosIcon;
+  }[];
   className?: string;
-};
+} & HTMLAttributes<HTMLElement>;
 
-const AdminSidebar = ({ className }: AdminSidebarProps) => {
+const AdminSidebar = ({ items, className, ...props }: AdminSidebarProps) => {
+  const pathName = usePathname();
+
   return (
     <aside
       className={cn("h-screen w-48 border-r-zinc-400 p-4 shadow-lg", className)}
+      {...props}
     >
       <nav>
         <ul className="flex flex-col gap-6 text-2xl">
-          <li>
-            <LinkButtons Icon={HouseLine} active href="/admin" text="Home" />
-          </li>
-          <li>
-            <LinkButtons Icon={Synagogue} href="/admin" text="Gurudwara" />
-          </li>
-          <li>
-            <LinkButtons Icon={MapPin} href="/admin" text="Location" />
-          </li>
-          <li>
-            <LinkButtons Icon={BookBookmark} href="/admin" text="Journals" />
-          </li>
-          <li>
-            <LinkButtons Icon={Barcode} href="/admin" text="Fund QR codes" />
-          </li>
+          {items.map((item) => (
+            <li key={item.href}>
+              <LinkButtons
+                Icon={item.Icon ?? DotOutline}
+                active={pathName === item.href}
+                href={item.href}
+                text={item.title}
+              />
+            </li>
+          ))}
         </ul>
       </nav>
     </aside>
