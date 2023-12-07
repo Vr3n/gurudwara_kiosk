@@ -1,22 +1,75 @@
 import KioskBaseLayout from "~/layouts/KioskBaseLayout";
-import { Card, CardHeader } from "~/components/ui/card";
+import { Card, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import {
   ArrowCircleLeft,
   ArrowCircleRight,
   Translate,
 } from "@phosphor-icons/react";
+
+import { parseAsString, useQueryState } from "next-usequerystate";
 import { type KioskButtonPropType } from "~/components/KioskButton/KioskButton";
+import { cn } from "~/lib/utils";
+import { Languages } from "~/constants/languages";
+
+/* The Language Selector Card component.
+ *
+ * */
+type CardProps = React.ComponentProps<typeof Card>;
+
+type LanguageSelectorCardProps = {
+  className?: string;
+  welcomeText: string;
+  text: string;
+  activeLanguage: string;
+} & CardProps;
+
+const LanguageSelectorCard = ({
+  className,
+  welcomeText,
+  activeLanguage,
+  text,
+  ...props
+}: LanguageSelectorCardProps) => {
+  const ACTIVE_CARD_STYLE = "border-2 border-red-300 shadow-2xl";
+
+  return (
+    <Card
+      className={cn(
+        "cursor-pointer p-2 shadow-md shadow-zinc-300 transition-shadow delay-200 hover:shadow-xl",
+        activeLanguage === text && ACTIVE_CARD_STYLE,
+        className,
+      )}
+      {...props}
+    >
+      <CardHeader>
+        <CardTitle className="text-2xl">{welcomeText}</CardTitle>
+      </CardHeader>
+      <CardFooter>
+        <p className="text-6xl">{text}</p>
+      </CardFooter>
+    </Card>
+  );
+};
 
 /* The language selector page.
  */
 export default function Home() {
+  const [activeLanguage, setActiveLanguage] = useQueryState(
+    "language"
+  );
+
   return (
     <>
-      <Card className="grid">
-        <CardHeader>
-          Use Grid layout here! (Refer Tailwind Css Grids)
-        </CardHeader>
-      </Card>
+      <div className="grid grid-cols-3 gap-4">
+        {Languages.map((item) => (
+          <LanguageSelectorCard
+            activeLanguage={activeLanguage}
+            onClick={() => setActiveLanguage(item.language)}
+            welcomeText={item.welcomeText}
+            text={item.language}
+          />
+        ))}
+      </div>
     </>
   );
 }
