@@ -10,6 +10,8 @@ import { parseAsString, useQueryState } from "next-usequerystate";
 import { type KioskButtonPropType } from "~/components/KioskButton/KioskButton";
 import { cn } from "~/lib/utils";
 import { Languages } from "~/constants/languages";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 /* The Language Selector Card component.
  *
@@ -54,15 +56,15 @@ const LanguageSelectorCard = ({
 /* The language selector page.
  */
 export default function Home() {
-  const [activeLanguage, setActiveLanguage] = useQueryState(
-    "language"
-  );
+  const [activeLanguage, setActiveLanguage] = useState<string>("English");
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1  gap-4 md:grid-cols-2 lg:grid-cols-3">
         {Languages.map((item) => (
           <LanguageSelectorCard
+            className="h-full"
+            key={item.language}
             activeLanguage={activeLanguage}
             onClick={() => setActiveLanguage(item.language)}
             welcomeText={item.welcomeText}
@@ -85,7 +87,7 @@ const navButtons: KioskButtonPropType[] = [
     Icon: ArrowCircleLeft,
   },
   {
-    href: "/next",
+    href: "/location",
     text: "Next",
     type: "primary",
     Icon: ArrowCircleRight,
@@ -99,6 +101,7 @@ const navButtons: KioskButtonPropType[] = [
 // eslint-disable-next-line
 Home.getLayout = (page: any) => (
   <KioskBaseLayout
+    key="home-page"
     Icon={Translate}
     heading="Choose your preferred Language"
     navButtons={navButtons}
