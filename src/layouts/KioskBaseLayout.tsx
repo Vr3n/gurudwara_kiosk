@@ -10,7 +10,6 @@ type KioskBaseLayoutProps = {
   Icon: PhosIcon;
   heading: string;
   children: React.ReactNode;
-  navButtons: KioskButtonPropType[];
 };
 
 export const fontSans = FontSans({
@@ -26,12 +25,7 @@ export const fontSans = FontSans({
  * to render navigation buttons.
  *
  * */
-const KioskBaseLayout = ({
-  Icon,
-  heading,
-  children,
-  navButtons,
-}: KioskBaseLayoutProps) => {
+const KioskBaseLayout = ({ Icon, heading, children }: KioskBaseLayoutProps) => {
   return (
     <>
       {/* Container */}
@@ -62,20 +56,6 @@ const KioskBaseLayout = ({
 
           {/* Content */}
           <section className="my-6 grow">{children}</section>
-
-          {/* Navigation Footer */}
-          <footer className="flex justify-between">
-            {navButtons.map((btn) => (
-              <KioskButton
-                key={btn.href}
-                href={btn.href}
-                text={btn.text}
-                type={btn.type}
-                Icon={btn.Icon}
-                className={btn.className}
-              />
-            ))}
-          </footer>
         </div>
       </main>
     </>

@@ -51,6 +51,7 @@ const locationNames = [
   { name: "Millwoods" },
 ];
 
+
 export default function LocationPage() {
   const [activeLocation, setActiveLocation] = useState<string>("");
 
@@ -71,24 +72,6 @@ export default function LocationPage() {
   );
 }
 
-/* The Footer Navigation buttons list.
- *
- */
-const navButtons: KioskButtonPropType[] = [
-  {
-    href: "/admin",
-    text: "Back",
-    type: "secondary",
-    Icon: ArrowCircleLeft,
-  },
-  {
-    href: "/location",
-    text: "Next",
-    type: "primary",
-    Icon: ArrowCircleRight,
-  },
-];
-
 /* to set the layout of the page.
  * use this as an example for other pages too.
  */
@@ -99,7 +82,6 @@ LocationPage.getLayout = (page: any) => (
     key="location-page"
     Icon={MapPin}
     heading="Select Available Location"
-    navButtons={navButtons}
   >
     {page}
   </KioskBaseLayout>

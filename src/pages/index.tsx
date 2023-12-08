@@ -1,17 +1,10 @@
 import KioskBaseLayout from "~/layouts/KioskBaseLayout";
 import { Card, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
-import {
-  ArrowCircleLeft,
-  ArrowCircleRight,
-  Translate,
-} from "@phosphor-icons/react";
+import { Translate } from "@phosphor-icons/react";
 
-import { parseAsString, useQueryState } from "next-usequerystate";
-import { type KioskButtonPropType } from "~/components/KioskButton/KioskButton";
 import { cn } from "~/lib/utils";
 import { Languages } from "~/constants/languages";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 /* The Language Selector Card component.
  *
@@ -76,24 +69,6 @@ export default function Home() {
   );
 }
 
-/* The Footer Navigation buttons list.
- *
- */
-const navButtons: KioskButtonPropType[] = [
-  {
-    href: "/admin",
-    text: "Back",
-    type: "secondary",
-    Icon: ArrowCircleLeft,
-  },
-  {
-    href: "/location",
-    text: "Next",
-    type: "primary",
-    Icon: ArrowCircleRight,
-  },
-];
-
 /* to set the layout of the page.
  * use this as an example for other pages too.
  */
@@ -104,7 +79,6 @@ Home.getLayout = (page: any) => (
     key="home-page"
     Icon={Translate}
     heading="Choose your preferred Language"
-    navButtons={navButtons}
   >
     {page}
   </KioskBaseLayout>
