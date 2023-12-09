@@ -3,13 +3,15 @@ import { Button } from "../ui/button";
 import { cn } from "~/lib/utils";
 import Link from "next/link";
 
+type LinkType = React.ComponentProps<typeof Link>;
+
 export type KioskButtonPropType = {
-  type: "primary" | "secondary";
+  type?: "primary" | "secondary";
   Icon: PhosIcon;
   text: string;
+  disabled?: boolean;
   className?: string;
-  href: string;
-};
+} & LinkType;
 
 const btnClasses = {
   primary: "px-20 py-10 text-2xl",
@@ -41,11 +43,12 @@ const KioskButton = ({
   Icon,
   text,
   className,
-  href,
+  disabled = false,
+  ...props
 }: KioskButtonPropType) => {
   return (
-    <Link href={href}>
-      <Button className={cn(btnClasses[type], className)}>
+    <Link {...props}>
+      <Button disabled={disabled} className={cn(btnClasses[type], className)}>
         <Icon
           size={24}
           color={type == "primary" ? "#fff" : "#bec2bf"}

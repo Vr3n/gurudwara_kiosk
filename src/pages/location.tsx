@@ -3,8 +3,9 @@ import {
   ArrowCircleRight,
   MapPin,
 } from "@phosphor-icons/react";
+import { useRouter } from "next/router";
 import { useState } from "react";
-import { type KioskButtonPropType } from "~/components/KioskButton/KioskButton";
+import KioskButton from "~/components/KioskButton/KioskButton";
 import { Card, CardHeader, CardTitle } from "~/components/ui/card";
 import KioskBaseLayout from "~/layouts/KioskBaseLayout";
 import { cn } from "~/lib/utils";
@@ -51,24 +52,65 @@ const locationNames = [
   { name: "Millwoods" },
 ];
 
-
 export default function LocationPage() {
+  const router = useRouter();
   const [activeLocation, setActiveLocation] = useState<string>("");
 
   return (
-    <div className="flex gap-4">
-      <div className="grow rounded-md border-2 border-zinc-300"></div>
-      <div className="flex w-1/4 flex-col gap-4">
-        {locationNames.map((location) => (
-          <LocationNameCard
-            key={location.name}
-            activeLocation={activeLocation}
-            onClick={() => setActiveLocation(location.name)}
-            locationName={location.name}
-          />
-        ))}
+    <>
+      <div className="flex gap-4">
+        {/* Map Grid */}
+        <div className="grow rounded-md border-2 border-zinc-300"></div>
+        {/* Location Buttons */}
+        <div className="flex w-1/4 flex-col gap-4">
+          {locationNames.map((location) => (
+            <LocationNameCard
+              key={location.name}
+              activeLocation={activeLocation}
+              onClick={() => setActiveLocation(location.name)}
+              locationName={location.name}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+      <footer className="mt-6">
+        {activeLocation !== null ? (
+          <div className="flex justify-between">
+            <KioskButton
+              onClick={() => router.back()}
+              href=""
+              type="secondary"
+              text="Back"
+              Icon={ArrowCircleLeft}
+            />
+            {
+              activeLocation !== "" ? (
+                <KioskButton
+                  href={{
+                    pathname: "/[slug]",
+                    query: { slug: activeLocation },
+                  }}
+                  type="primary"
+                  text="Next"
+                  Icon={ArrowCircleRight}
+                />
+              ) : (
+                <KioskButton
+                  href={{
+                    pathname: "/[slug]",
+                    query: { slug: activeLocation },
+                  }}
+                  disabled={true}
+                  type="secondary"
+                  text="Next"
+                  Icon={ArrowCircleRight}
+                />
+              )
+            }
+          </div>
+        ) : null}
+      </footer>
+    </>
   );
 }
 

@@ -17,13 +17,12 @@ const KioskLocationBaseLayout = ({
     <>
       {/* Container */}
       <main
-        className={cn(
-          "mx-auto max-h-screen max-w-screen-xl px-4 py-8 font-sans",
-          fontSans.variable,
-        )}
+        className={cn("mx-auto max-w-screen-xl font-sans", fontSans.variable)}
       >
-        {/* Content */}
-        <section className="my-6 border-zinc-600">{children}</section>
+        <div className="flex min-h-screen flex-col p-8">
+          {/* Content */}
+          <section className="min-h-screen grow">{children}</section>
+        </div>
       </main>
     </>
   );

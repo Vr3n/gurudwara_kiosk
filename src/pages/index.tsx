@@ -1,10 +1,11 @@
 import KioskBaseLayout from "~/layouts/KioskBaseLayout";
 import { Card, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
-import { Translate } from "@phosphor-icons/react";
+import { ArrowCircleRight, Translate } from "@phosphor-icons/react";
 
 import { cn } from "~/lib/utils";
 import { Languages } from "~/constants/languages";
 import { useState } from "react";
+import KioskButton from "~/components/KioskButton/KioskButton";
 
 /* The Language Selector Card component.
  *
@@ -65,6 +66,19 @@ export default function Home() {
           />
         ))}
       </div>
+      <footer className="mt-6">
+        {activeLanguage !== null ? (
+          <div className="flex justify-between">
+            <span></span>
+            <KioskButton
+              href="/location"
+              type="primary"
+              text="Next"
+              Icon={ArrowCircleRight}
+            />
+          </div>
+        ) : null}
+      </footer>
     </>
   );
 }
