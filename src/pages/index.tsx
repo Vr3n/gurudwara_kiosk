@@ -1,15 +1,11 @@
 import KioskBaseLayout from "~/layouts/KioskBaseLayout";
 import { Card, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
-import {
-  ArrowCircleLeft,
-  ArrowCircleRight,
-  Translate,
-} from "@phosphor-icons/react";
+import { ArrowCircleRight, Translate } from "@phosphor-icons/react";
 
-import { parseAsString, useQueryState } from "next-usequerystate";
-import { type KioskButtonPropType } from "~/components/KioskButton/KioskButton";
 import { cn } from "~/lib/utils";
 import { Languages } from "~/constants/languages";
+import { useState } from "react";
+import KioskButton from "~/components/KioskButton/KioskButton";
 
 /* The Language Selector Card component.
  *
@@ -54,15 +50,15 @@ const LanguageSelectorCard = ({
 /* The language selector page.
  */
 export default function Home() {
-  const [activeLanguage, setActiveLanguage] = useQueryState(
-    "language"
-  );
+  const [activeLanguage, setActiveLanguage] = useState<string>("English");
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1  gap-4 md:grid-cols-2 lg:grid-cols-3">
         {Languages.map((item) => (
           <LanguageSelectorCard
+            className="h-full"
+            key={item.language}
             activeLanguage={activeLanguage}
             onClick={() => setActiveLanguage(item.language)}
             welcomeText={item.welcomeText}
@@ -70,27 +66,22 @@ export default function Home() {
           />
         ))}
       </div>
+      <footer className="mt-6">
+        {activeLanguage !== null ? (
+          <div className="flex justify-between">
+            <span></span>
+            <KioskButton
+              href="/location"
+              type="primary"
+              text="Next"
+              Icon={ArrowCircleRight}
+            />
+          </div>
+        ) : null}
+      </footer>
     </>
   );
 }
-
-/* The Footer Navigation buttons list.
- *
- */
-const navButtons: KioskButtonPropType[] = [
-  {
-    href: "/admin",
-    text: "Back",
-    type: "secondary",
-    Icon: ArrowCircleLeft,
-  },
-  {
-    href: "/next",
-    text: "Next",
-    type: "primary",
-    Icon: ArrowCircleRight,
-  },
-];
 
 /* to set the layout of the page.
  * use this as an example for other pages too.
@@ -99,9 +90,9 @@ const navButtons: KioskButtonPropType[] = [
 // eslint-disable-next-line
 Home.getLayout = (page: any) => (
   <KioskBaseLayout
+    key="home-page"
     Icon={Translate}
     heading="Choose your preferred Language"
-    navButtons={navButtons}
   >
     {page}
   </KioskBaseLayout>

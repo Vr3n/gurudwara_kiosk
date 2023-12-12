@@ -10,7 +10,6 @@ type KioskBaseLayoutProps = {
   Icon: PhosIcon;
   heading: string;
   children: React.ReactNode;
-  navButtons: KioskButtonPropType[];
 };
 
 export const fontSans = FontSans({
@@ -26,55 +25,38 @@ export const fontSans = FontSans({
  * to render navigation buttons.
  *
  * */
-const KioskBaseLayout = ({
-  Icon,
-  heading,
-  children,
-  navButtons,
-}: KioskBaseLayoutProps) => {
+const KioskBaseLayout = ({ Icon, heading, children }: KioskBaseLayoutProps) => {
   return (
     <>
       {/* Container */}
       <main
         className={cn(
-          "mx-auto max-w-screen-xl px-4 py-8 font-sans",
+          " mx-auto   max-w-screen-xl  font-sans",
           fontSans.variable,
         )}
       >
-        {/* Heading */}
-        <header className="flex justify-between">
-          <Avatar className="h-24 w-32">
-            <AvatarImage src="/logo.png" alt="sikh-society-logo" />
-          </Avatar>
+        <div className="flex min-h-screen flex-col px-4 py-8">
+          {/* Heading */}
+          <header className="flex justify-between">
+            <Avatar className="h-24 w-32">
+              <AvatarImage src="/logo.png" alt="sikh-society-logo" />
+            </Avatar>
 
-          {/* Title and Icon of the Page */}
-          <span className="flex flex-col gap-4">
-            <div className="self-end rounded-full p-4 shadow-lg shadow-gray-300 sm:self-center">
-              <Icon size={42} color="#0c286a" weight="bold" />
-            </div>
-            <p className="text-2xl font-medium md:text-4xl">{heading}</p>
-          </span>
+            {/* Title and Icon of the Page */}
+            <span className="flex flex-col gap-4">
+              <div className="self-end rounded-full p-4 shadow-lg shadow-gray-300 sm:self-center">
+                <Icon size={42} color="#0c286a" weight="bold" />
+              </div>
+              <p className="text-2xl font-medium md:text-4xl">{heading}</p>
+            </span>
 
-          {/* Empty block for proper spacing */}
-          <span className="hidden sm:block md:mx-8"></span>
-        </header>
+            {/* Empty block for proper spacing */}
+            <span className="hidden sm:block md:mx-8"></span>
+          </header>
 
-        {/* Content */}
-        <section className="my-6">{children}</section>
-
-        {/* Navigation Footer */}
-        <footer className="flex justify-between">
-          {navButtons.map((btn) => (
-            <KioskButton
-              key={btn.href}
-              href={btn.href}
-              text={btn.text}
-              type={btn.type}
-              Icon={btn.Icon}
-              className={btn.className}
-            />
-          ))}
-        </footer>
+          {/* Content */}
+          <section className="my-6 grow">{children}</section>
+        </div>
       </main>
     </>
   );
