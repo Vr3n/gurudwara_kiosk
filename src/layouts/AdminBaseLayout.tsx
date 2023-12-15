@@ -1,7 +1,9 @@
 import AdminNavbar from "~/components/AdminNav/AdminNavbar";
 import { Nunito as FontSans } from "next/font/google";
 import { cn } from "~/lib/utils";
-import AdminSidebar, { AdminSidebarProps } from "~/components/AdminSidebar/AdminSidebar";
+import AdminSidebar, {
+  type AdminSidebarProps,
+} from "~/components/AdminSidebar/AdminSidebar";
 import { useState } from "react";
 import {
   HouseLine,
@@ -9,7 +11,9 @@ import {
   MapPin,
   BookBookmark,
   Barcode,
-} from "@phosphor-icons/react"
+} from "@phosphor-icons/react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type AdminBaseLayoutProps = {
   children: React.ReactNode;
@@ -20,44 +24,43 @@ export const fontSans = FontSans({
   variable: "--font-sans",
 });
 
-
 const sidebarItems: AdminSidebarProps["items"] = [
   {
     href: "/admin",
     title: "Home",
-    Icon: HouseLine
+    Icon: HouseLine,
   },
   {
     href: "/admin/locations",
     title: "Locations",
-    Icon: MapPin
+    Icon: MapPin,
   },
   {
     href: "/admin/gurudwaras",
     title: "Gurudwara",
-    Icon: Synagogue
+    Icon: Synagogue,
   },
   {
     href: "/admin/journals",
     title: "Journals",
-    Icon: BookBookmark
+    Icon: BookBookmark,
   },
   {
     href: "/admin/news",
     title: "News",
-    Icon: BookBookmark
+    Icon: BookBookmark,
   },
   {
     href: "/admin/histories",
     title: "Histories",
-    Icon: BookBookmark
+    Icon: BookBookmark,
   },
   {
     href: "/admin/fund-qrcodes",
     title: "Fund QR Codes",
-    Icon: Barcode
+    Icon: Barcode,
   },
-]
+];
 
 const AdminBaseLayout = ({ children }: AdminBaseLayoutProps) => {
   const [isSidebarVisible, setIsSidebarVisible] = useState<boolean>(true);
@@ -74,8 +77,9 @@ const AdminBaseLayout = ({ children }: AdminBaseLayoutProps) => {
           items={sidebarItems}
           className={cn("hidden", isSidebarVisible ? "block" : null)}
         />
-        <main className="p-4">{children}</main>
+        <main className="w-full p-4">{children}</main>
       </span>
+      <ToastContainer />
     </div>
   );
 };
