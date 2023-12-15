@@ -31,14 +31,14 @@ const sidebarItems: AdminSidebarProps["items"] = [
     Icon: HouseLine,
   },
   {
-    href: "/admin/locations",
-    title: "Locations",
-    Icon: MapPin,
-  },
-  {
     href: "/admin/gurudwaras",
     title: "Gurudwara",
     Icon: Synagogue,
+  },
+  {
+    href: "/admin/locations",
+    title: "Locations",
+    Icon: MapPin,
   },
   {
     href: "/admin/journals",

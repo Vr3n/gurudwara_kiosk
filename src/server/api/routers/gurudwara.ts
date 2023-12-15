@@ -1,7 +1,7 @@
 import {
+  deleteGurudwaraFormSchema,
   gurudwaraFormSchema,
   updateGurudwaraFormSchema,
-  deleteGurudwaraFormSchema,
 } from "~/schemas/gurudwaraSchemas";
 
 import {
@@ -17,7 +17,7 @@ export const gurudwaraRouter = createTRPCRouter({
     });
   }),
 
-  create: publicProcedure
+  create: protectedProcedure
     .input(gurudwaraFormSchema)
     .mutation(async ({ ctx, input }) => {
       return ctx.db.gurudwara.create({
