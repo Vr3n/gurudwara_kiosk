@@ -84,7 +84,8 @@ model Gurudwara {
     histories   History[]
     news        News[]
     journals    Journal[]
-    medias      Media[]
+    videos      Video[]
+    images      Image[]
 }
 
 
@@ -146,8 +147,20 @@ model Journal {
 
 }
 
+model Video {
+    id          String  @id @default(cuid())
+    url         String  @unique
 
-model Media {
+    gurudwaraId String
+    gurudwara   Gurudwara    @relation(fields: [gurudwaraId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+}
+
+
+model Image {
     id          String  @id @default(cuid())
     url         String  @unique
 

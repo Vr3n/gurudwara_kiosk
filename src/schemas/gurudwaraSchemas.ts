@@ -12,3 +12,7 @@ export const updateGurudwaraFormSchema = z.object({
     message: "Name must be at least 2 characters.",
   }),
 });
+
+export const deleteGurudwaraFormSchema = z.object({
+  id: z.string({ required_error: "Gurudwara Id not selected!" }),
+});
