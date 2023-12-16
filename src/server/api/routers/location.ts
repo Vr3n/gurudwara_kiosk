@@ -16,7 +16,7 @@ export const locationRouter = createTRPCRouter({
     });
   }),
 
-  create: publicProcedure
+  create: protectedProcedure
     .input(locationFormSchema)
     .mutation(async ({ ctx, input }) => {
       return ctx.db.location.create({

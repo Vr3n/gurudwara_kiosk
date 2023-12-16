@@ -2,6 +2,11 @@ import { postRouter } from "~/server/api/routers/post";
 import { createTRPCRouter } from "~/server/api/trpc";
 import { gurudwaraRouter } from "./routers/gurudwara";
 import { locationRouter } from "./routers/location";
+import { journalRouter } from "./routers/journal";
+import { historyRouter } from "./routers/history";
+import { newsRouter } from "./routers/news";
+import { imageRouter } from "./routers/image";
+import { videoRouter } from "./routers/video";
 
 /**
  * This is the primary router for your server.
@@ -12,6 +17,11 @@ export const appRouter = createTRPCRouter({
   post: postRouter,
   gurudwara: gurudwaraRouter,
   location: locationRouter,
+  journal: journalRouter,
+  video: videoRouter,
+  image: imageRouter,
+  news: newsRouter,
+  history: historyRouter,
 });
 
 // export type definition of API

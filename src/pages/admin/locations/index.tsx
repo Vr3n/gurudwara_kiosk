@@ -38,12 +38,16 @@ interface LocationsHomeProps {
 }
 
 const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
-  const { data: gurudwaraList, isLoading: isGurudwaraLoading } =
-    api.gurudwara.getAll.useQuery();
+  const {
+    data: gurudwaraList,
+    isLoading: isGurudwaraLoading,
+    refetch: refetchGurudwaras,
+  } = api.gurudwara.getAll.useQuery();
 
   const { mutate } = api.location.create.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Location Added successfully!");
+      await refetchGurudwaras();
     },
     onError: (error) => {
       console.log(error);

@@ -8,34 +8,21 @@ import { Input } from "~/components/ui/input";
 import { useState } from "react";
 import { Textarea } from "~/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
+import { historyFormSchema } from "~/schemas/historySchemas";
+import { api } from "~/utils/api";
 
-
-const FormSchema = z.object({
-  title: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-  source: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-  description: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-})
-
-// ... (other imports)
-
-interface HistoriesHomeProps {
-  getLayout: (page: any) => React.ReactNode;
-  // Add any additional props you might have for HistoriesHome
-}
 
 const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+
+  const { data: gurudwaraList, isLoading: isGurudwaraLoading, refetch: refetchGurudwaras } =
+    api.gurudwara.getAll.useQuery();
+
+  const form = useForm<z.infer<typeof historyFormSchema>>({
+    resolver: zodResolver(historyFormSchema),
     defaultValues: {
+      gurudwaraId: "",
       title: "",
       source: "",
-      description: "",
     },
   });
 
@@ -69,75 +56,75 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               </svg>
             </Button>
           </div>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-xl p-8 bg-white shadow-md rounded-lg">
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Title"
-                  {...field}
-                  className="w-full p-3 border border-gray-300 rounded-md"
-                />
-              </FormControl>
-              <FormDescription>This is the title of your history.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="source"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Source</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Source"
-                  {...field}
-                  className="w-full p-3 border border-gray-300 rounded-md"
-                />
-              </FormControl>
-              <FormDescription>This is the source of your history.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Description"
-                  {...field}
-                  className="w-full p-3 border border-gray-300 rounded-md"
-                />
-              </FormControl>
-              <FormDescription>This is the description of your history.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-3 px-4 mt-4 rounded-md hover:bg-blue-600"
-        >
-          Submit
-        </Button>
-      </form>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-xl p-8 bg-white shadow-md rounded-lg">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Title"
+                      {...field}
+                      className="w-full p-3 border border-gray-300 rounded-md"
+                    />
+                  </FormControl>
+                  <FormDescription>This is the title of your history.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="source"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Source</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Source"
+                      {...field}
+                      className="w-full p-3 border border-gray-300 rounded-md"
+                    />
+                  </FormControl>
+                  <FormDescription>This is the source of your history.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Description"
+                      {...field}
+                      className="w-full p-3 border border-gray-300 rounded-md"
+                    />
+                  </FormControl>
+                  <FormDescription>This is the description of your history.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              className="w-full bg-blue-500 text-white py-3 px-4 mt-4 rounded-md hover:bg-blue-600"
+            >
+              Submit
+            </Button>
+          </form>
+        </div>
       </div>
-    </div>
-  </Form>
+    </Form>
   );
 };
 
-const HistoriesHome = ()=> {
+const HistoriesHome = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const openForm = () => {
@@ -164,9 +151,9 @@ const HistoriesHome = ()=> {
         </Button>
         {isFormOpen && <AddHistoryForm onClose={closeForm} />}
       </div>
-      
-        
-      
+
+
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
