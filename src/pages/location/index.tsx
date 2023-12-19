@@ -9,6 +9,33 @@ import KioskButton from "~/components/KioskButton/KioskButton";
 import { Card, CardHeader, CardTitle } from "~/components/ui/card";
 import KioskBaseLayout from "~/layouts/KioskBaseLayout";
 import { cn } from "~/lib/utils";
+import { env } from "~/env.js";
+import Map from "react-map-gl";
+
+/* THe Map component
+ *
+ */
+const LocationMap = () => {
+  const mapboxAccessToken = env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+  const [viewState, setViewState] = useState({
+    longitude: -114.0,
+    latitude: 51.04,
+    zoom: 10,
+  });
+
+  return (
+    <>
+      <Map
+        reuseMaps
+        mapboxAccessToken={mapboxAccessToken}
+        {...viewState}
+        style={{ width: "100%", height: "100%", borderRadius: 10 }}
+        onMove={(evt) => setViewState(evt.viewState)}
+        mapStyle="mapbox://styles/mapbox/dark-v10"
+      />
+    </>
+  );
+};
 
 /* The Location Selector Card component.
  *
@@ -60,7 +87,9 @@ export default function LocationPage() {
     <>
       <div className="flex gap-4">
         {/* Map Grid */}
-        <div className="grow rounded-md border-2 border-zinc-300"></div>
+        <div className="grow rounded-md border-2 border-zinc-300 p-2">
+          <LocationMap />
+        </div>
         {/* Location Buttons */}
         <div className="flex w-1/4 flex-col gap-4">
           {locationNames.map((location) => (
