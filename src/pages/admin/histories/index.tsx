@@ -1,21 +1,45 @@
 import AdminBaseLayout from "~/layouts/AdminBaseLayout";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
 import { useForm } from "react-hook-form";
-import * as z from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { useState } from "react";
 import { Textarea } from "~/components/ui/textarea";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
 import { historyFormSchema } from "~/schemas/historySchemas";
 import { api } from "~/utils/api";
-
+import { toast } from "react-toastify";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 
 const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-
-  const { data: gurudwaraList, isLoading: isGurudwaraLoading, refetch: refetchGurudwaras } =
-    api.gurudwara.getAll.useQuery();
+  const {
+    data: gurudwaraList,
+    isLoading: isGurudwaraLoading,
+    refetch: refetchGurudwaras,
+  } = api.gurudwara.getAll.useQuery();
 
   const form = useForm<z.infer<typeof historyFormSchema>>({
     resolver: zodResolver(historyFormSchema),
@@ -26,19 +50,28 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     },
   });
 
-  const onSubmit = () => {
-    console.log("form submitted");
+  const { mutate } = api.history.create.useMutation({
+    onSuccess: async () => {
+      toast.success("History added succesfully!");
+      await refetchGurudwaras();
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error(error.message);
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof historyFormSchema>) => {
+    mutate(historyFormSchema.parse(values));
     onClose();
   };
 
   return (
     <Form {...form}>
       <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-        <div className="w-full max-w-xl p-8 bg-white shadow-md rounded-lg">
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={onClose}
-            >
+        <div className="w-full max-w-xl rounded-lg bg-white p-8 shadow-md">
+          <div className="mb-4 flex justify-end">
+            <Button onClick={onClose}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -56,7 +89,43 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               </svg>
             </Button>
           </div>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-xl p-8 bg-white shadow-md rounded-lg">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="w-full max-w-xl rounded-lg bg-white p-8 shadow-md"
+          >
+            <FormField
+              control={form.control}
+              name="gurudwaraId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gurudwara</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a gurudwara to attach the location to." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {isGurudwaraLoading
+                        ? "Loading..."
+                        : gurudwaraList?.map((gurudwara) => {
+                            return (
+                              <SelectItem
+                                key={gurudwara.id}
+                                value={gurudwara.id}
+                              >
+                                {gurudwara.name}
+                              </SelectItem>
+                            );
+                          })}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="title"
@@ -67,10 +136,12 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                     <Input
                       placeholder="Title"
                       {...field}
-                      className="w-full p-3 border border-gray-300 rounded-md"
+                      className="w-full rounded-md border border-gray-300 p-3"
                     />
                   </FormControl>
-                  <FormDescription>This is the title of your history.</FormDescription>
+                  <FormDescription>
+                    This is the title of your history.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -85,35 +156,19 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                     <Input
                       placeholder="Source"
                       {...field}
-                      className="w-full p-3 border border-gray-300 rounded-md"
+                      className="w-full rounded-md border border-gray-300 p-3"
                     />
                   </FormControl>
-                  <FormDescription>This is the source of your history.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Description"
-                      {...field}
-                      className="w-full p-3 border border-gray-300 rounded-md"
-                    />
-                  </FormControl>
-                  <FormDescription>This is the description of your history.</FormDescription>
+                  <FormDescription>
+                    This is the source of your history.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <Button
               type="submit"
-              className="w-full bg-blue-500 text-white py-3 px-4 mt-4 rounded-md hover:bg-blue-600"
+              className="mt-4 w-full rounded-md bg-blue-500 px-4 py-3 text-white hover:bg-blue-600"
             >
               Submit
             </Button>
@@ -146,31 +201,28 @@ const HistoriesHome = () => {
           // }
           className="max-w-sm"
         />
-        <Button onClick={openForm} className="ml-4 bg-blue-500 text-white py-3 px-4 rounded-md hover:bg-blue-600">
+        <Button
+          onClick={openForm}
+          className="ml-4 rounded-md bg-blue-500 px-4 py-3 text-white hover:bg-blue-600"
+        >
           Add History
         </Button>
         {isFormOpen && <AddHistoryForm onClose={closeForm} />}
       </div>
 
-
-
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            <TableRow >
-              <TableHead ></TableHead>
+            <TableRow>
+              <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell >
-                {/* Your table content goes here */}
-              </TableCell>
+              <TableCell>{/* Your table content goes here */}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>
-                No results.
-              </TableCell>
+              <TableCell>No results.</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -183,4 +235,4 @@ HistoriesHome.getLayout = (page: any) => (
   <AdminBaseLayout>{page}</AdminBaseLayout>
 );
 
-export default HistoriesHome
+export default HistoriesHome;
