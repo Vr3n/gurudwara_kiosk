@@ -9,12 +9,11 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+import type * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { useState } from "react";
-import { Textarea } from "~/components/ui/textarea";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -23,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { historyFormSchema } from "~/schemas/historySchemas";
+import { imageFormSchema } from "~/schemas/imageSchemas";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 import {
@@ -34,15 +33,13 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 
-const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const {
-    data: gurudwaraList,
-    isLoading: isGurudwaraLoading,
-    refetch: refetchGurudwaras,
-  } = api.gurudwara.getAll.useQuery();
+interface ImagesHomeProps {
+  onClose: () => void;
+}
 
-  const form = useForm<z.infer<typeof historyFormSchema>>({
-    resolver: zodResolver(historyFormSchema),
+const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose }) => {
+  const form = useForm<z.infer<typeof imageFormSchema>>({
+    resolver: zodResolver(imageFormSchema),
     defaultValues: {
       gurudwaraId: "",
       title: "",
@@ -50,9 +47,15 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     },
   });
 
-  const { mutate } = api.history.create.useMutation({
+  const {
+    data: gurudwaraList,
+    isLoading: isGurudwaraLoading,
+    refetch: refetchGurudwaras,
+  } = api.gurudwara.getAll.useQuery();
+
+  const { mutate } = api.image.create.useMutation({
     onSuccess: async () => {
-      toast.success("History added succesfully!");
+      toast.success("Image added succesfully!");
       await refetchGurudwaras();
     },
     onError: (error) => {
@@ -61,8 +64,8 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof historyFormSchema>) => {
-    mutate(historyFormSchema.parse(values));
+  const onSubmit = (values: z.infer<typeof imageFormSchema>) => {
+    mutate(imageFormSchema.parse(values));
     onClose();
   };
 
@@ -112,15 +115,15 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                       {isGurudwaraLoading
                         ? "Loading..."
                         : gurudwaraList?.map((gurudwara) => {
-                          return (
-                            <SelectItem
-                              key={gurudwara.id}
-                              value={gurudwara.id}
-                            >
-                              {gurudwara.name}
-                            </SelectItem>
-                          );
-                        })}
+                            return (
+                              <SelectItem
+                                key={gurudwara.id}
+                                value={gurudwara.id}
+                              >
+                                {gurudwara.name}
+                              </SelectItem>
+                            );
+                          })}
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -128,40 +131,18 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             />
             <FormField
               control={form.control}
-              name="title"
+              name="url"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Title"
+                      type="image"
                       {...field}
                       className="w-full rounded-md border border-gray-300 p-3"
                     />
                   </FormControl>
-                  <FormDescription>
-                    This is the title of your history.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="source"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Source</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Source"
-                      {...field}
-                      className="w-full rounded-md border border-gray-300 p-3"
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    This is the source of your history.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -179,7 +160,7 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   );
 };
 
-const HistoriesHome = () => {
+const ImageHome = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const openForm = () => {
@@ -205,9 +186,10 @@ const HistoriesHome = () => {
           onClick={openForm}
           className="ml-4 rounded-md bg-blue-500 px-4 py-3 text-white hover:bg-blue-600"
         >
-          Add History
+          Add Image
         </Button>
-        {isFormOpen && <AddHistoryForm onClose={closeForm} />}
+
+        {isFormOpen && <AddImageForm onClose={closeForm} />}
       </div>
 
       <div className="rounded-md border">
@@ -232,8 +214,6 @@ const HistoriesHome = () => {
 };
 
 // eslint-disable-next-line
-HistoriesHome.getLayout = (page: any) => (
-  <AdminBaseLayout>{page}</AdminBaseLayout>
-);
+ImageHome.getLayout = (page: any) => <AdminBaseLayout>{page}</AdminBaseLayout>;
 
-export default HistoriesHome;
+export default ImageHome;
