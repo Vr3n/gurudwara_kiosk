@@ -1,50 +1,83 @@
 import AdminBaseLayout from "~/layouts/AdminBaseLayout";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
 import { useForm } from "react-hook-form";
-import * as z from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import React, { useState } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "~/components/ui/dropdown-menu";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
-
-const FormSchema = z.object({
-  country: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-  state: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-});
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { api } from "~/utils/api";
+import { locationFormSchema } from "~/schemas/locationSchemas";
+import { toast } from "react-toastify";
 
 interface LocationsHomeProps {
   onClose: () => void;
 }
 
 const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      country: "",
-      state: "",
+  const {
+    data: gurudwaraList,
+    isLoading: isGurudwaraLoading,
+    refetch: refetchGurudwaras,
+  } = api.gurudwara.getAll.useQuery();
+
+  const { mutate } = api.location.create.useMutation({
+    onSuccess: async () => {
+      toast.success("Location Added successfully!");
+      await refetchGurudwaras();
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error(error.message);
     },
   });
 
-  const onSubmit = () => {
-    console.log("form submitted");
+  const form = useForm<z.infer<typeof locationFormSchema>>({
+    resolver: zodResolver(locationFormSchema),
+    defaultValues: {
+      gurudwaraId: "",
+      city: "",
+      state: "",
+      country: "",
+      longitude: "",
+      latitude: "",
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof locationFormSchema>) => {
+    mutate(locationFormSchema.parse(values));
     onClose();
   };
 
   return (
     <Form {...form}>
-      <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-        <div className="w-full max-w-xl p-8 bg-white shadow-md rounded-lg">
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={onClose}
-            >
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
+        <div className="w-full max-w-xl rounded-lg bg-white p-8 shadow-md">
+          <div className="mb-4 flex justify-end">
+            <Button onClick={onClose}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -65,6 +98,99 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
+              name="gurudwaraId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gurudwara</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a gurudwara to attach the location to." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {isGurudwaraLoading
+                        ? "Loading..."
+                        : gurudwaraList?.map((gurudwara) => {
+                            return (
+                              <SelectItem
+                                key={gurudwara.id}
+                                value={gurudwara.id}
+                              >
+                                {gurudwara.name}
+                              </SelectItem>
+                            );
+                          })}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>City</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="City"
+                      {...field}
+                      className="w-full rounded-md border border-gray-300 p-3"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    This is the city of the gurudwara.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="latitude"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Latitude</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Latitude"
+                      {...field}
+                      className="w-full rounded-md border border-gray-300 p-3"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    This is the latitude of the location.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="longitude"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Longitude</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Longitude"
+                      {...field}
+                      className="w-full rounded-md border border-gray-300 p-3"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    This is the longitude of the location.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="country"
               render={({ field }) => (
                 <FormItem>
@@ -73,10 +199,12 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
                     <Input
                       placeholder="Country"
                       {...field}
-                      className="w-full p-3 border border-gray-300 rounded-md"
+                      className="w-full rounded-md border border-gray-300 p-3"
                     />
                   </FormControl>
-                  <FormDescription>This is the country of the location.</FormDescription>
+                  <FormDescription>
+                    This is the country of the location.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -91,17 +219,19 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
                     <Input
                       placeholder="State"
                       {...field}
-                      className="w-full p-3 border border-gray-300 rounded-md"
+                      className="w-full rounded-md border border-gray-300 p-3"
                     />
                   </FormControl>
-                  <FormDescription>This is the state of the location.</FormDescription>
+                  <FormDescription>
+                    This is the state of the location.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <Button
               type="submit"
-              className="w-full bg-blue-500 text-white py-3 px-4 mt-4 rounded-md hover:bg-blue-600"
+              className="mt-4 w-full rounded-md bg-blue-500 px-4 py-3 text-white hover:bg-blue-600"
             >
               Submit
             </Button>
@@ -134,31 +264,28 @@ const LocationsHome = () => {
           // }
           className="max-w-sm"
         />
-        <Button onClick={openForm} className="ml-4 bg-blue-500 text-white py-3 px-4 rounded-md hover:bg-blue-600">
+        <Button
+          onClick={openForm}
+          className="ml-4 rounded-md bg-blue-500 px-4 py-3 text-white hover:bg-blue-600"
+        >
           Add Location
         </Button>
         {isFormOpen && <AddLocationForm onClose={closeForm} />}
       </div>
-      
-        
-      
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            <TableRow >
-              <TableHead ></TableHead>
+            <TableRow>
+              <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell >
-                {/* Your table content goes here */}
-              </TableCell>
+              <TableCell>{/* Your table content goes here */}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>
-                No results.
-              </TableCell>
+              <TableCell>No results.</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -175,6 +302,7 @@ const LocationsHome = () => {
   );
 };
 
+// eslint-disable-next-line
 LocationsHome.getLayout = (page: any) => (
   <AdminBaseLayout>{page}</AdminBaseLayout>
 );

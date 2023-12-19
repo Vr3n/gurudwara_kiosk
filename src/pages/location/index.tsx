@@ -83,30 +83,28 @@ export default function LocationPage() {
               text="Back"
               Icon={ArrowCircleLeft}
             />
-            {
-              activeLocation !== "" ? (
-                <KioskButton
-                  href={{
-                    pathname: "/[slug]",
-                    query: { slug: activeLocation },
-                  }}
-                  type="primary"
-                  text="Next"
-                  Icon={ArrowCircleRight}
-                />
-              ) : (
-                <KioskButton
-                  href={{
-                    pathname: "/[slug]",
-                    query: { slug: activeLocation },
-                  }}
-                  disabled={true}
-                  type="secondary"
-                  text="Next"
-                  Icon={ArrowCircleRight}
-                />
-              )
-            }
+            {activeLocation !== "" ? (
+              <KioskButton
+                href={{
+                  pathname: "/location/[slug]",
+                  query: { slug: activeLocation },
+                }}
+                type="primary"
+                text="Next"
+                Icon={ArrowCircleRight}
+              />
+            ) : (
+              <KioskButton
+                href={{
+                  pathname: "/location/[slug]",
+                  query: { slug: activeLocation },
+                }}
+                disabled={true}
+                type="secondary"
+                text="Next"
+                Icon={ArrowCircleRight}
+              />
+            )}
           </div>
         ) : null}
       </footer>
