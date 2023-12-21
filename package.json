@@ -12,6 +12,9 @@
     "lint": "next lint",
     "start": "next start"
   },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
   "dependencies": {
     "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.3.2",
@@ -36,6 +39,7 @@
     "@trpc/react-query": "^10.43.6",
     "@trpc/server": "^10.43.6",
     "@types/mapbox-gl": "^2.7.19",
+    "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "lucide-react": "^0.294.0",
@@ -57,8 +61,9 @@
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.0.3",
     "@tailwindcss/forms": "^0.5.7",
+    "@types/bcrypt": "^5.0.2",
     "@types/eslint": "^8.44.7",
-    "@types/node": "^18.17.0",
+    "@types/node": "^18.19.3",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@typescript-eslint/eslint-plugin": "^6.11.0",
@@ -70,7 +75,8 @@
     "prettier-plugin-tailwindcss": "^0.5.7",
     "prisma": "^5.6.0",
     "tailwindcss": "^3.3.5",
-    "typescript": "^5.1.6"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   },
   "ct3aMetadata": {
     "initVersion": "7.24.0"

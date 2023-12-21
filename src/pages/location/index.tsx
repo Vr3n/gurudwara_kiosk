@@ -25,14 +25,14 @@ const LocationMap = () => {
 
   return (
     <>
-      <Map
+      {/* <Map
         reuseMaps
         mapboxAccessToken={mapboxAccessToken}
         {...viewState}
         style={{ width: "100%", height: "100%", borderRadius: 10 }}
         onMove={(evt) => setViewState(evt.viewState)}
         mapStyle="mapbox://styles/mapbox/dark-v10"
-      />
+      /> */}
     </>
   );
 };
