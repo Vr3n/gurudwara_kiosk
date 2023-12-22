@@ -22,3 +22,7 @@ export const updateLocationFormSchema = z.object({
     message: "Gurudwara id not selected!",
   }),
 });
+
+export const searchByCityNameSchema = z.object({
+  name: z.string(),
+});

@@ -8,9 +8,7 @@ import {
 
 export const cityRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.db.city.findMany({
-      orderBy: { createdAt: "desc" },
-    });
+    return ctx.db.city.findMany();
   }),
 
   create: protectedProcedure
