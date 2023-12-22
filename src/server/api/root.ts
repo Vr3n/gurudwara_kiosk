@@ -7,6 +7,7 @@ import { historyRouter } from "./routers/history";
 import { newsRouter } from "./routers/news";
 import { imageRouter } from "./routers/image";
 import { videoRouter } from "./routers/video";
+import { cityRouter } from "./routers/city";
 
 /**
  * This is the primary router for your server.
@@ -22,6 +23,7 @@ export const appRouter = createTRPCRouter({
   image: imageRouter,
   news: newsRouter,
   history: historyRouter,
+  city: cityRouter,
 });
 
 // export type definition of API

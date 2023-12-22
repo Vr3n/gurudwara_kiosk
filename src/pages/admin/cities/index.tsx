@@ -22,38 +22,18 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 import { api } from "~/utils/api";
-import { locationFormSchema } from "~/schemas/locationSchemas";
+import { cityFormSchema } from "~/schemas/citiesSchemas";
 import { toast } from "react-toastify";
 
-interface LocationsHomeProps {
+interface CitysHomeProps {
   onClose: () => void;
 }
 
-const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
-  const {
-    data: gurudwaraList,
-    isLoading: isGurudwaraLoading,
-    refetch: refetchGurudwaras,
-  } = api.gurudwara.getAll.useQuery();
-
-  const {
-    data: cityList,
-    isLoading: isCityLoading,
-    refetch: refetchCitys,
-  } = api.city.getAll.useQuery();
-
-  const { mutate } = api.location.create.useMutation({
+const AddCityForm: React.FC<CitysHomeProps> = ({ onClose }) => {
+  const { mutate } = api.city.create.useMutation({
     onSuccess: async () => {
-      toast.success("Location Added successfully!");
-      await refetchGurudwaras();
+      toast.success("City Added successfully!");
     },
     onError: (error) => {
       console.log(error);
@@ -61,21 +41,18 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
     },
   });
 
-  const form = useForm<z.infer<typeof locationFormSchema>>({
+  const form = useForm<z.infer<typeof cityFormSchema>>({
     mode: "onChange",
-    resolver: zodResolver(locationFormSchema),
+    resolver: zodResolver(cityFormSchema),
     defaultValues: {
-      gurudwaraId: "",
-      cityId: "",
-      state: "",
-      country: "",
+      name: "",
       longitude: 0,
       latitude: 0,
     },
   });
 
-  const onSubmit = (values: z.infer<typeof locationFormSchema>) => {
-    mutate(locationFormSchema.parse(values));
+  const onSubmit = (values: z.infer<typeof cityFormSchema>) => {
+    mutate(cityFormSchema.parse(values));
     onClose();
   };
 
@@ -84,7 +61,7 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
         <div className="w-full max-w-xl rounded-lg bg-white p-8 shadow-md">
           <div className="mb-4 flex justify-between">
-            <p className="text-2xl font-bold">Add New Location</p>
+            <p className="text-2xl font-bold">Add New City</p>
             <Button onClick={onClose}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -106,64 +83,21 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="gurudwaraId"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gurudwara</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a gurudwara to attach the location to." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {isGurudwaraLoading
-                        ? "Loading..."
-                        : gurudwaraList?.map((gurudwara) => {
-                            return (
-                              <SelectItem
-                                key={gurudwara.id}
-                                value={gurudwara.id}
-                              >
-                                {gurudwara.name}
-                              </SelectItem>
-                            );
-                          })}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="cityId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>City</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a City to attach the location to." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {isCityLoading
-                        ? "Loading..."
-                        : cityList?.map((city) => {
-                            return (
-                              <SelectItem key={city.id} value={city.id}>
-                                {city.name}
-                              </SelectItem>
-                            );
-                          })}
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>City Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Name"
+                      {...field}
+                      className="w-full rounded-md border border-gray-300 p-3"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    This is the name of the city.
+                  </FormDescription>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -182,7 +116,7 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
                     />
                   </FormControl>
                   <FormDescription>
-                    This is the latitude of the location.
+                    This is the latitude of the city.
                   </FormDescription>
                   <FormDescription>
                     The latitude should be minimum -90 and maximum 90.
@@ -206,50 +140,10 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
                     />
                   </FormControl>
                   <FormDescription>
-                    This is the longitude of the location.
+                    This is the longitude of the city.
                   </FormDescription>
                   <FormDescription>
                     The longitude should be minimum -180 and maximum 180.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Country"
-                      {...field}
-                      className="w-full rounded-md border border-gray-300 p-3"
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    This is the country of the location.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="state"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>State</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="State"
-                      {...field}
-                      className="w-full rounded-md border border-gray-300 p-3"
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    This is the state of the location.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -268,7 +162,7 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
   );
 };
 
-const LocationsHome = () => {
+const CitysHome = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const openForm = () => {
@@ -294,9 +188,9 @@ const LocationsHome = () => {
           onClick={openForm}
           className="ml-4 rounded-md bg-blue-500 px-4 py-3 text-white hover:bg-blue-600"
         >
-          Add Location
+          Add City
         </Button>
-        {isFormOpen && <AddLocationForm onClose={closeForm} />}
+        {isFormOpen && <AddCityForm onClose={closeForm} />}
       </div>
 
       <div className="rounded-md border">
@@ -321,7 +215,7 @@ const LocationsHome = () => {
           {/* Row(s) selected }
         </div>
         <Button onClick={openForm} className="w-full bg-blue-500 text-white py-3 px-4 rounded-md hover:bg-blue-600">
-          Add Location
+          Add City
         </Button>
       </div> */}
     </div>
@@ -329,8 +223,6 @@ const LocationsHome = () => {
 };
 
 // eslint-disable-next-line
-LocationsHome.getLayout = (page: any) => (
-  <AdminBaseLayout>{page}</AdminBaseLayout>
-);
+CitysHome.getLayout = (page: any) => <AdminBaseLayout>{page}</AdminBaseLayout>;
 
-export default LocationsHome;
+export default CitysHome;

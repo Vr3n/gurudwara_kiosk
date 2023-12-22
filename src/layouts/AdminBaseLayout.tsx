@@ -11,6 +11,7 @@ import {
   MapPin,
   BookBookmark,
   Barcode,
+  GlobeStand,
 } from "@phosphor-icons/react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -34,6 +35,11 @@ const sidebarItems: AdminSidebarProps["items"] = [
     href: "/admin/gurudwaras",
     title: "Gurudwara",
     Icon: Synagogue,
+  },
+  {
+    href: "/admin/cities",
+    title: "Cities",
+    Icon: GlobeStand,
   },
   {
     href: "/admin/locations",
