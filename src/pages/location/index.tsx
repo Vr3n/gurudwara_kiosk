@@ -4,35 +4,91 @@ import {
   MapPin,
 } from "@phosphor-icons/react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import KioskButton from "~/components/KioskButton/KioskButton";
 import { Card, CardHeader, CardTitle } from "~/components/ui/card";
 import KioskBaseLayout from "~/layouts/KioskBaseLayout";
 import { cn } from "~/lib/utils";
 import { env } from "~/env.js";
-import Map from "react-map-gl";
+import Map, { Marker } from "react-map-gl";
+import { api } from "~/utils/api";
+import type { City } from "@prisma/client";
 
 /* THe Map component
  *
  */
-const LocationMap = () => {
+type LocationMapProps = {
+  activeLocation: City;
+};
+
+const LocationMap = ({ activeLocation }: LocationMapProps) => {
   const mapboxAccessToken = env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+
+  if (activeLocation === undefined) {
+    return <p>Loading the Map...</p>;
+  }
+
+  const longitude: number = +activeLocation.longitude;
+  const latitude: number = +activeLocation.latitude;
+
   const [viewState, setViewState] = useState({
-    longitude: -114.0,
-    latitude: 51.04,
-    zoom: 10,
+    longitude: longitude,
+    latitude: latitude,
+    zoom: 11,
   });
+
+  const { data: locationList } = api.location.getByCity.useQuery(
+    { name: activeLocation.name },
+    {
+      queryKey: ["location.getByCity", activeLocation],
+      refetchOnWindowFocus: false,
+      enabled: !!activeLocation.name,
+    },
+  );
+
+  useEffect(() => {
+    const longitude: number = +activeLocation.longitude;
+    const latitude: number = +activeLocation.latitude;
+    setViewState({
+      longitude: longitude,
+      latitude: latitude,
+      zoom: 11,
+    });
+  }, [activeLocation]);
+
+  const markers = useMemo(
+    () =>
+      !!locationList &&
+      locationList.map((location) => (
+        <Marker
+          key={location.id}
+          longitude={+location.longitude}
+          latitude={+location.latitude}
+        >
+          <MapPin size={24} color="#d11d1d" weight="fill" />
+        </Marker>
+      )),
+    [locationList],
+  );
 
   return (
     <>
-      {/* <Map
+      <Map
         reuseMaps
         mapboxAccessToken={mapboxAccessToken}
         {...viewState}
         style={{ width: "100%", height: "100%", borderRadius: 10 }}
-        onMove={(evt) => setViewState(evt.viewState)}
+        onMove={(evt) =>
+          setViewState({
+            longitude: evt.viewState.longitude,
+            latitude: evt.viewState.latitude,
+            zoom: evt.viewState.zoom,
+          })
+        }
         mapStyle="mapbox://styles/mapbox/dark-v10"
-      /> */}
+      >
+        {markers}
+      </Map>
     </>
   );
 };
@@ -72,32 +128,51 @@ const LocationNameCard = ({
   );
 };
 
-const locationNames = [
-  { name: "Calgary" },
-  { name: "Edmonton" },
-  { name: "Lakeview" },
-  { name: "Millwoods" },
-];
-
 export default function LocationPage() {
   const router = useRouter();
-  const [activeLocation, setActiveLocation] = useState<string>("");
+
+  const [activeLocation, setActiveLocation] = useState<City>();
+
+  const {
+    data: cityList,
+    isLoading: isCityLoading,
+    error,
+  } = api.city.getAll.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    onSuccess: (data) => {
+      if (data !== undefined) {
+        setActiveLocation(data[0]);
+      }
+    },
+  });
+
+  if (isCityLoading && cityList === undefined) {
+    return <p className="text-xl font-bold">Loading Cities...</p>;
+  }
+
+  if (error) {
+    return (
+      <p className="text-xl font-bold">
+        An error has occured ... {error.message}
+      </p>
+    );
+  }
 
   return (
     <>
       <div className="flex gap-4">
         {/* Map Grid */}
         <div className="grow rounded-md border-2 border-zinc-300 p-2">
-          <LocationMap />
+          <LocationMap activeLocation={activeLocation} />
         </div>
         {/* Location Buttons */}
         <div className="flex w-1/4 flex-col gap-4">
-          {locationNames.map((location) => (
+          {cityList?.map((city) => (
             <LocationNameCard
-              key={location.name}
-              activeLocation={activeLocation}
-              onClick={() => setActiveLocation(location.name)}
-              locationName={location.name}
+              key={city.name}
+              activeLocation={activeLocation?.name ?? ""}
+              onClick={() => setActiveLocation(city)}
+              locationName={city.name}
             />
           ))}
         </div>
@@ -112,11 +187,11 @@ export default function LocationPage() {
               text="Back"
               Icon={ArrowCircleLeft}
             />
-            {activeLocation !== "" ? (
+            {activeLocation !== null ? (
               <KioskButton
                 href={{
                   pathname: "/location/[slug]",
-                  query: { slug: activeLocation },
+                  query: { slug: activeLocation?.name },
                 }}
                 type="primary"
                 text="Next"

@@ -1,6 +1,7 @@
 import {
   locationFormSchema,
   updateLocationFormSchema,
+  searchByCityNameSchema,
 } from "~/schemas/locationSchemas";
 
 import {
@@ -15,6 +16,18 @@ export const locationRouter = createTRPCRouter({
       orderBy: { createdAt: "desc" },
     });
   }),
+
+  getByCity: publicProcedure
+    .input(searchByCityNameSchema)
+    .query(async ({ ctx, input }) => {
+      return ctx.db.location.findMany({
+        where: {
+          city: {
+            name: input.name,
+          },
+        },
+      });
+    }),
 
   create: protectedProcedure
     .input(locationFormSchema)
