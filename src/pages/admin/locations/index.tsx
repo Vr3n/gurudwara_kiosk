@@ -9,7 +9,7 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+import type * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -44,6 +44,12 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
     refetch: refetchGurudwaras,
   } = api.gurudwara.getAll.useQuery();
 
+  const {
+    data: cityList,
+    isLoading: isCityLoading,
+    refetch: refetchCitys,
+  } = api.city.getAll.useQuery();
+
   const { mutate } = api.location.create.useMutation({
     onSuccess: async () => {
       toast.success("Location Added successfully!");
@@ -56,14 +62,15 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
   });
 
   const form = useForm<z.infer<typeof locationFormSchema>>({
+    mode: "onChange",
     resolver: zodResolver(locationFormSchema),
     defaultValues: {
       gurudwaraId: "",
-      city: "",
+      cityId: "",
       state: "",
       country: "",
-      longitude: "",
-      latitude: "",
+      longitude: 0,
+      latitude: 0,
     },
   });
 
@@ -76,7 +83,8 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
     <Form {...form}>
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
         <div className="w-full max-w-xl rounded-lg bg-white p-8 shadow-md">
-          <div className="mb-4 flex justify-end">
+          <div className="mb-4 flex justify-between">
+            <p className="text-2xl font-bold">Add New Location</p>
             <Button onClick={onClose}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -131,21 +139,31 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
             />
             <FormField
               control={form.control}
-              name="city"
+              name="cityId"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>City</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="City"
-                      {...field}
-                      className="w-full rounded-md border border-gray-300 p-3"
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    This is the city of the gurudwara.
-                  </FormDescription>
-                  <FormMessage />
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a City to attach the location to." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {isCityLoading
+                        ? "Loading..."
+                        : cityList?.map((city) => {
+                            return (
+                              <SelectItem key={city.id} value={city.id}>
+                                {city.name}
+                              </SelectItem>
+                            );
+                          })}
+                    </SelectContent>
+                  </Select>
                 </FormItem>
               )}
             />
@@ -159,11 +177,15 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
                     <Input
                       placeholder="Latitude"
                       {...field}
+                      type="number"
                       className="w-full rounded-md border border-gray-300 p-3"
                     />
                   </FormControl>
                   <FormDescription>
                     This is the latitude of the location.
+                  </FormDescription>
+                  <FormDescription>
+                    The latitude should be minimum -90 and maximum 90.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -179,11 +201,15 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
                     <Input
                       placeholder="Longitude"
                       {...field}
+                      type="number"
                       className="w-full rounded-md border border-gray-300 p-3"
                     />
                   </FormControl>
                   <FormDescription>
                     This is the longitude of the location.
+                  </FormDescription>
+                  <FormDescription>
+                    The longitude should be minimum -180 and maximum 180.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

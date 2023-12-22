@@ -9,12 +9,11 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+import type * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { useState } from "react";
-import { Textarea } from "~/components/ui/textarea";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -23,37 +22,18 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { historyFormSchema } from "~/schemas/historySchemas";
 import { api } from "~/utils/api";
+import { cityFormSchema } from "~/schemas/citiesSchemas";
 import { toast } from "react-toastify";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 
-const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const {
-    data: gurudwaraList,
-    isLoading: isGurudwaraLoading,
-    refetch: refetchGurudwaras,
-  } = api.gurudwara.getAll.useQuery();
+interface CitysHomeProps {
+  onClose: () => void;
+}
 
-  const form = useForm<z.infer<typeof historyFormSchema>>({
-    resolver: zodResolver(historyFormSchema),
-    defaultValues: {
-      gurudwaraId: "",
-      title: "",
-      source: "",
-    },
-  });
-
-  const { mutate } = api.history.create.useMutation({
+const AddCityForm: React.FC<CitysHomeProps> = ({ onClose }) => {
+  const { mutate } = api.city.create.useMutation({
     onSuccess: async () => {
-      toast.success("History added succesfully!");
-      await refetchGurudwaras();
+      toast.success("City Added successfully!");
     },
     onError: (error) => {
       console.log(error);
@@ -61,16 +41,27 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof historyFormSchema>) => {
-    mutate(historyFormSchema.parse(values));
+  const form = useForm<z.infer<typeof cityFormSchema>>({
+    mode: "onChange",
+    resolver: zodResolver(cityFormSchema),
+    defaultValues: {
+      name: "",
+      longitude: 0,
+      latitude: 0,
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof cityFormSchema>) => {
+    mutate(cityFormSchema.parse(values));
     onClose();
   };
 
   return (
     <Form {...form}>
-      <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
         <div className="w-full max-w-xl rounded-lg bg-white p-8 shadow-md">
-          <div className="mb-4 flex justify-end">
+          <div className="mb-4 flex justify-between">
+            <p className="text-2xl font-bold">Add New City</p>
             <Button onClick={onClose}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -89,58 +80,22 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               </svg>
             </Button>
           </div>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="w-full max-w-xl rounded-lg bg-white p-8 shadow-md"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="gurudwaraId"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gurudwara</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a gurudwara to attach the location to." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {isGurudwaraLoading
-                        ? "Loading..."
-                        : gurudwaraList?.map((gurudwara) => {
-                          return (
-                            <SelectItem
-                              key={gurudwara.id}
-                              value={gurudwara.id}
-                            >
-                              {gurudwara.name}
-                            </SelectItem>
-                          );
-                        })}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>City Name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Title"
+                      placeholder="Name"
                       {...field}
                       className="w-full rounded-md border border-gray-300 p-3"
                     />
                   </FormControl>
                   <FormDescription>
-                    This is the title of your history.
+                    This is the name of the city.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -148,19 +103,47 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             />
             <FormField
               control={form.control}
-              name="source"
+              name="latitude"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Source</FormLabel>
+                  <FormLabel>Latitude</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Source"
+                      placeholder="Latitude"
                       {...field}
+                      type="number"
                       className="w-full rounded-md border border-gray-300 p-3"
                     />
                   </FormControl>
                   <FormDescription>
-                    This is the source of your history.
+                    This is the latitude of the city.
+                  </FormDescription>
+                  <FormDescription>
+                    The latitude should be minimum -90 and maximum 90.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="longitude"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Longitude</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Longitude"
+                      {...field}
+                      type="number"
+                      className="w-full rounded-md border border-gray-300 p-3"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    This is the longitude of the city.
+                  </FormDescription>
+                  <FormDescription>
+                    The longitude should be minimum -180 and maximum 180.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -179,7 +162,7 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   );
 };
 
-const HistoriesHome = () => {
+const CitysHome = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const openForm = () => {
@@ -205,9 +188,9 @@ const HistoriesHome = () => {
           onClick={openForm}
           className="ml-4 rounded-md bg-blue-500 px-4 py-3 text-white hover:bg-blue-600"
         >
-          Add History
+          Add City
         </Button>
-        {isFormOpen && <AddHistoryForm onClose={closeForm} />}
+        {isFormOpen && <AddCityForm onClose={closeForm} />}
       </div>
 
       <div className="rounded-md border">
@@ -227,13 +210,19 @@ const HistoriesHome = () => {
           </TableBody>
         </Table>
       </div>
+      {/* <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {/* Row(s) selected }
+        </div>
+        <Button onClick={openForm} className="w-full bg-blue-500 text-white py-3 px-4 rounded-md hover:bg-blue-600">
+          Add City
+        </Button>
+      </div> */}
     </div>
   );
 };
 
 // eslint-disable-next-line
-HistoriesHome.getLayout = (page: any) => (
-  <AdminBaseLayout>{page}</AdminBaseLayout>
-);
+CitysHome.getLayout = (page: any) => <AdminBaseLayout>{page}</AdminBaseLayout>;
 
-export default HistoriesHome;
+export default CitysHome;
