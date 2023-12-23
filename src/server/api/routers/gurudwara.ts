@@ -1,6 +1,7 @@
 import {
   gurudwaraFormSchema,
   updateGurudwaraFormSchema,
+  searchByIdSchema,
 } from "~/schemas/gurudwaraSchemas";
 
 import {
@@ -15,6 +16,16 @@ export const gurudwaraRouter = createTRPCRouter({
       orderBy: { createdAt: "desc" },
     });
   }),
+
+  getById: publicProcedure
+    .input(searchByIdSchema)
+    .query(async ({ ctx, input }) => {
+      return ctx.db.gurudwara.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+    }),
 
   create: protectedProcedure
     .input(gurudwaraFormSchema)

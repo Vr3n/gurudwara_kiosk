@@ -13,6 +13,7 @@ import { env } from "~/env.js";
 import Map, { Marker } from "react-map-gl";
 import { api } from "~/utils/api";
 import type { City } from "@prisma/client";
+import LocationHoverCard from "~/components/LocationHoverCard/LocationHoverCard";
 
 /* THe Map component
  *
@@ -65,7 +66,7 @@ const LocationMap = ({ activeLocation }: LocationMapProps) => {
           longitude={+location.longitude}
           latitude={+location.latitude}
         >
-          <MapPin size={24} color="#d11d1d" weight="fill" />
+          <LocationHoverCard location={location} />
         </Marker>
       )),
     [locationList],
@@ -163,7 +164,7 @@ export default function LocationPage() {
       <div className="flex gap-4">
         {/* Map Grid */}
         <div className="grow rounded-md border-2 border-zinc-300 p-2">
-          <LocationMap activeLocation={activeLocation} />
+          {!!activeLocation && <LocationMap activeLocation={activeLocation} />}
         </div>
         {/* Location Buttons */}
         <div className="flex w-1/4 flex-col gap-4">

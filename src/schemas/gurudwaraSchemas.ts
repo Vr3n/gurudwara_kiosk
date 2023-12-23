@@ -16,3 +16,7 @@ export const updateGurudwaraFormSchema = z.object({
 export const deleteGurudwaraFormSchema = z.object({
   id: z.string({ required_error: "Gurudwara Id not selected!" }),
 });
+
+export const searchByIdSchema = z.object({
+  id: z.string({ required_error: "Gurudwara Id not selected!" }),
+});
