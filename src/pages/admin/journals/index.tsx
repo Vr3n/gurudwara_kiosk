@@ -1,3 +1,27 @@
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
+const editorConfiguration = {
+  toolbar: [
+    "heading",
+    "|",
+    "bold",
+    "italic",
+    "link",
+    "bulletedList",
+    "numberedList",
+    "|",
+    "outdent",
+    "indent",
+    "|",
+    "imageUpload",
+    "blockQuote",
+    "insertTable",
+    "mediaEmbed",
+    "undo",
+    "redo",
+  ],
+};
 import AdminBaseLayout from "~/layouts/AdminBaseLayout";
 import {
   Form,
@@ -169,6 +193,30 @@ const AddJournalForm: React.FC<JournalsHomeProps> = ({ onClose }) => {
                 </FormItem>
               )}
             />
+            <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <CKEditor
+                    editor={ClassicEditor}
+                    config={editorConfiguration}
+                    onChange={(event, editor) => {
+                      const data = editor.getData();
+                      console.log({ event, editor, data });
+                    }}
+                  />
+                </FormControl>
+                <FormDescription>
+                  This is the Description of your journal.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
             <Button
               type="submit"
               className="mt-4 w-full rounded-md bg-blue-500 px-4 py-3 text-white hover:bg-blue-600"
