@@ -9,12 +9,11 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+import type * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { useState } from "react";
-import { Textarea } from "~/components/ui/textarea";
 import {
   Table,
   TableBody,
@@ -207,6 +206,11 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 const HistoriesHome = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
+  const { data: historyList, isLoading: isHistoryLoading } =
+    api.history.getAll.useQuery(undefined, {
+      refetchOnWindowFocus: false,
+    });
+
   const openForm = () => {
     setIsFormOpen(true);
   };
@@ -239,16 +243,25 @@ const HistoriesHome = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead></TableHead>
+              <TableHead>title</TableHead>
+              <TableHead>gurudwara</TableHead>
+              <TableHead>source</TableHead>
+              <TableHead>created at</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell>{/* Your table content goes here */}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>No results.</TableCell>
-            </TableRow>
+            {isHistoryLoading ? (
+              <p className="font-bold">Loading...</p>
+            ) : (
+              historyList?.map((history) => (
+                <TableRow key={history.id}>
+                  <TableCell>{history.title}</TableCell>
+                  <TableCell>{history.gurudwara.name}</TableCell>
+                  <TableCell>{history.source}</TableCell>
+                  <TableCell>{history.createdAt.toLocaleString()}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

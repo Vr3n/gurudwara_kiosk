@@ -173,6 +173,9 @@ const CitysHome = () => {
     setIsFormOpen(false);
   };
 
+  const { data: cityList, isLoading: isCityLoading } =
+    api.city.getAll.useQuery();
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
@@ -197,16 +200,23 @@ const CitysHome = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead></TableHead>
+              <TableHead>city</TableHead>
+              <TableHead>longitude</TableHead>
+              <TableHead>latitude</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell>{/* Your table content goes here */}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>No results.</TableCell>
-            </TableRow>
+            {isCityLoading ? (
+              <p className="font-bold">Loading...</p>
+            ) : (
+              cityList?.map((city) => (
+                <TableRow key={city.id}>
+                  <TableCell>{city.name}</TableCell>
+                  <TableCell>{city.longitude.toString()}</TableCell>
+                  <TableCell>{city.latitude.toString()}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

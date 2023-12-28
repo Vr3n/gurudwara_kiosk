@@ -210,6 +210,13 @@ const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
 const NewsHome = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
+  const { data: newsList, isLoading: isNewsLoading } = api.news.getAll.useQuery(
+    undefined,
+    {
+      refetchOnWindowFocus: false,
+    },
+  );
+
   const openForm = () => {
     setIsFormOpen(true);
   };
@@ -243,16 +250,25 @@ const NewsHome = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead></TableHead>
+              <TableHead>title</TableHead>
+              <TableHead>gurudwara</TableHead>
+              <TableHead>source</TableHead>
+              <TableHead>created at</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell>{/* Your table content goes here */}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>No results.</TableCell>
-            </TableRow>
+            {isNewsLoading ? (
+              <p className="font-bold">Loading...</p>
+            ) : (
+              newsList?.map((news) => (
+                <TableRow key={news.id}>
+                  <TableCell>{news.title}</TableCell>
+                  <TableCell>{news.gurudwara.name}</TableCell>
+                  <TableCell>{news.source}</TableCell>
+                  <TableCell>{news.createdAt.toLocaleString()}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

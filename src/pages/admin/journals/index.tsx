@@ -209,6 +209,11 @@ const AddJournalForm: React.FC<JournalsHomeProps> = ({ onClose }) => {
 const JournalsHome = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
+  const { data: journalList, isLoading: isJournalLoading } =
+    api.journal.getAll.useQuery(undefined, {
+      refetchOnWindowFocus: false,
+    });
+
   const openForm = () => {
     setIsFormOpen(true);
   };
@@ -242,16 +247,25 @@ const JournalsHome = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead></TableHead>
+              <TableHead>title</TableHead>
+              <TableHead>gurudwara</TableHead>
+              <TableHead>source</TableHead>
+              <TableHead>created at</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell>{/* Your table content goes here */}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>No results.</TableCell>
-            </TableRow>
+            {isJournalLoading ? (
+              <p className="font-bold">Loading...</p>
+            ) : (
+              journalList?.map((journal) => (
+                <TableRow key={journal.id}>
+                  <TableCell>{journal.title}</TableCell>
+                  <TableCell>{journal.gurudwara.name}</TableCell>
+                  <TableCell>{journal.source}</TableCell>
+                  <TableCell>{journal.createdAt.toLocaleString()}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

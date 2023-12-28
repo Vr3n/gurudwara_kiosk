@@ -10,6 +10,9 @@ export const newsRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.db.news.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        gurudwara: true,
+      },
     });
   }),
 

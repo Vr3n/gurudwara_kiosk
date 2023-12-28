@@ -112,8 +112,14 @@ const MessageForm: React.FC<MessageFormProps> = ({ onClose }) => {
   );
 };
 
-const LocationsHome = () => {
+const GurudwarasHome = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const {
+    data: gurudwaraList,
+    isLoading: isGurudwaraLoading,
+    refetch: refetchGurudwaras,
+  } = api.gurudwara.getAll.useQuery();
 
   const openForm = () => {
     setIsFormOpen(true);
@@ -147,16 +153,21 @@ const LocationsHome = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead></TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Created At</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell>{/* Your table content goes here */}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>No results.</TableCell>
-            </TableRow>
+            {isGurudwaraLoading ? (
+              <p className="font-bold">Loading...</p>
+            ) : (
+              gurudwaraList?.map((gurudwara) => (
+                <TableRow key={gurudwara.id}>
+                  <TableCell>{gurudwara.name}</TableCell>
+                  <TableCell>{gurudwara.createdAt.toLocaleString()}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -164,8 +175,8 @@ const LocationsHome = () => {
   );
 };
 // eslint-disable-next-line
-LocationsHome.getLayout = (page: any) => (
+GurudwarasHome.getLayout = (page: any) => (
   <AdminBaseLayout>{page}</AdminBaseLayout>
 );
 
-export default LocationsHome;
+export default GurudwarasHome;

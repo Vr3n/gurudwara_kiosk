@@ -13,6 +13,9 @@ export const historyRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.db.history.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        gurudwara: true,
+      },
     });
   }),
 
