@@ -1,27 +1,3 @@
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-
-const editorConfiguration = {
-  toolbar: [
-    "heading",
-    "|",
-    "bold",
-    "italic",
-    "link",
-    "bulletedList",
-    "numberedList",
-    "|",
-    "outdent",
-    "indent",
-    "|",
-    "imageUpload",
-    "blockQuote",
-    "insertTable",
-    "mediaEmbed",
-    "undo",
-    "redo",
-  ],
-};
 import AdminBaseLayout from "~/layouts/AdminBaseLayout";
 import {
   Form,
@@ -57,13 +33,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import dynamic from "next/dynamic";
 
 const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const {
-    data: gurudwaraList,
-    isLoading: isGurudwaraLoading,
-    refetch: refetchGurudwaras,
-  } = api.gurudwara.getAll.useQuery();
+  const CKEditor = dynamic(() => import("~/components/Editor/Editor"), {
+    ssr: false,
+  });
+
+  const { data: gurudwaraList, isLoading: isGurudwaraLoading } =
+    api.gurudwara.getAll.useQuery(undefined, {
+      refetchOnWindowFocus: false,
+    });
 
   const form = useForm<z.infer<typeof historyFormSchema>>({
     resolver: zodResolver(historyFormSchema),
@@ -77,7 +57,6 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const { mutate } = api.history.create.useMutation({
     onSuccess: async () => {
       toast.success("History added succesfully!");
-      await refetchGurudwaras();
     },
     onError: (error) => {
       console.log(error);
@@ -136,15 +115,15 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                       {isGurudwaraLoading
                         ? "Loading..."
                         : gurudwaraList?.map((gurudwara) => {
-                          return (
-                            <SelectItem
-                              key={gurudwara.id}
-                              value={gurudwara.id}
-                            >
-                              {gurudwara.name}
-                            </SelectItem>
-                          );
-                        })}
+                            return (
+                              <SelectItem
+                                key={gurudwara.id}
+                                value={gurudwara.id}
+                              >
+                                {gurudwara.name}
+                              </SelectItem>
+                            );
+                          })}
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -192,22 +171,21 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             />
             <FormField
               control={form.control}
-              name="description"
+              name="content"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Content</FormLabel>
                   <FormControl>
                     <CKEditor
-                      editor={ClassicEditor}
-                      config={editorConfiguration}
+                      value={field.value}
                       onChange={(event, editor) => {
                         const data = editor.getData();
-                        console.log({ event, editor, data });
+                        form.setValue("content", data);
                       }}
                     />
                   </FormControl>
                   <FormDescription>
-                    This is the Description of your history.
+                    This is the Content of your history.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

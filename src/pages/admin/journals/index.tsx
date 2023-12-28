@@ -1,27 +1,3 @@
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-
-const editorConfiguration = {
-  toolbar: [
-    "heading",
-    "|",
-    "bold",
-    "italic",
-    "link",
-    "bulletedList",
-    "numberedList",
-    "|",
-    "outdent",
-    "indent",
-    "|",
-    "imageUpload",
-    "blockQuote",
-    "insertTable",
-    "mediaEmbed",
-    "undo",
-    "redo",
-  ],
-};
 import AdminBaseLayout from "~/layouts/AdminBaseLayout";
 import {
   Form,
@@ -56,12 +32,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import dynamic from "next/dynamic";
 
 interface JournalsHomeProps {
   onClose: () => void;
 }
 
 const AddJournalForm: React.FC<JournalsHomeProps> = ({ onClose }) => {
+  const CKEditor = dynamic(() => import("~/components/Editor/Editor"), {
+    ssr: false,
+  });
+
   const form = useForm<z.infer<typeof journalFormSchema>>({
     resolver: zodResolver(journalFormSchema),
     defaultValues: {
@@ -71,16 +52,14 @@ const AddJournalForm: React.FC<JournalsHomeProps> = ({ onClose }) => {
     },
   });
 
-  const {
-    data: gurudwaraList,
-    isLoading: isGurudwaraLoading,
-    refetch: refetchGurudwaras,
-  } = api.gurudwara.getAll.useQuery();
+  const { data: gurudwaraList, isLoading: isGurudwaraLoading } =
+    api.gurudwara.getAll.useQuery(undefined, {
+      refetchOnWindowFocus: false,
+    });
 
   const { mutate } = api.journal.create.useMutation({
     onSuccess: async () => {
       toast.success("Journal added succesfully!");
-      await refetchGurudwaras();
     },
     onError: (error) => {
       console.log(error);
@@ -194,28 +173,25 @@ const AddJournalForm: React.FC<JournalsHomeProps> = ({ onClose }) => {
               )}
             />
             <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <CKEditor
-                    editor={ClassicEditor}
-                    config={editorConfiguration}
-                    onChange={(event, editor) => {
-                      const data = editor.getData();
-                      console.log({ event, editor, data });
-                    }}
-                  />
-                </FormControl>
-                <FormDescription>
-                  This is the Description of your journal.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              control={form.control}
+              name="content"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Content</FormLabel>
+                  <FormControl>
+                    <CKEditor
+                      value={field.value}
+                      onChange={(event, editor) => {
+                        const data = editor.getData();
+                        form.setValue("content", data);
+                      }}
+                    />
+                  </FormControl>
+                  <FormDescription>Content of your jounral</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <Button
               type="submit"

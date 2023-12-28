@@ -1,27 +1,3 @@
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-
-const editorConfiguration = {
-  toolbar: [
-    "heading",
-    "|",
-    "bold",
-    "italic",
-    "link",
-    "bulletedList",
-    "numberedList",
-    "|",
-    "outdent",
-    "indent",
-    "|",
-    "imageUpload",
-    "blockQuote",
-    "insertTable",
-    "mediaEmbed",
-    "undo",
-    "redo",
-  ],
-};
 import AdminBaseLayout from "~/layouts/AdminBaseLayout";
 import {
   Form,
@@ -56,12 +32,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import dynamic from "next/dynamic";
 
 interface NewssHomeProps {
   onClose: () => void;
 }
 
 const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
+  const CKEditor = dynamic(() => import("~/components/Editor/Editor"), {
+    ssr: false,
+  });
+
   const form = useForm<z.infer<typeof newsFormSchema>>({
     resolver: zodResolver(newsFormSchema),
     defaultValues: {
@@ -71,11 +52,10 @@ const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
     },
   });
 
-  const {
-    data: gurudwaraList,
-    isLoading: isGurudwaraLoading,
-    refetch: refetchGurudwaras,
-  } = api.gurudwara.getAll.useQuery();
+  const { data: gurudwaraList, isLoading: isGurudwaraLoading } =
+    api.gurudwara.getAll.useQuery(undefined, {
+      refetchOnWindowFocus: false,
+    });
 
   const { mutate } = api.news.create.useMutation({
     onSuccess: async () => {
@@ -139,15 +119,15 @@ const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
                       {isGurudwaraLoading
                         ? "Loading..."
                         : gurudwaraList?.map((gurudwara) => {
-                          return (
-                            <SelectItem
-                              key={gurudwara.id}
-                              value={gurudwara.id}
-                            >
-                              {gurudwara.name}
-                            </SelectItem>
-                          );
-                        })}
+                            return (
+                              <SelectItem
+                                key={gurudwara.id}
+                                value={gurudwara.id}
+                              >
+                                {gurudwara.name}
+                              </SelectItem>
+                            );
+                          })}
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -195,17 +175,15 @@ const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
             />
             <FormField
               control={form.control}
-              name="description"
+              name="content"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Content</FormLabel>
                   <FormControl>
                     <CKEditor
-                      editor={ClassicEditor}
-                      config={editorConfiguration}
                       onChange={(event, editor) => {
                         const data = editor.getData();
-                        console.log({ event, editor, data });
+                        form.setValue("content", data);
                       }}
                     />
                   </FormControl>
@@ -214,7 +192,8 @@ const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
-              )}/>
+              )}
+            />
             <Button
               type="submit"
               className="mt-4 w-full rounded-md bg-blue-500 px-4 py-3 text-white hover:bg-blue-600"

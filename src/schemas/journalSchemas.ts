@@ -10,17 +10,9 @@ export const journalFormSchema = z.object({
   source: z.string().min(2, {
     message: "source not provided!",
   }),
+  content: z.string(),
 });
 
-export const updateJournalFormSchema = z.object({
+export const updateJournalFormSchema = journalFormSchema.extend({
   id: z.string().cuid(),
-  gurudwaraId: z.string().min(2, {
-    message: "Gurudwara id not selected!",
-  }),
-  title: z.string().min(2, {
-    message: "title not provided!",
-  }),
-  source: z.string().min(2, {
-    message: "source not provided!",
-  }),
 });

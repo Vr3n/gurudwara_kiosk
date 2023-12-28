@@ -128,6 +128,7 @@ model History {
     id          String  @id @default(cuid())
     title       String
     source      String?
+    content     String?
 
     gurudwaraId String
     gurudwara   Gurudwara    @relation(fields: [gurudwaraId], references: [id], onDelete: Cascade)
@@ -142,6 +143,7 @@ model News {
     id          String  @id @default(cuid())
     title       String
     source      String?
+    content     String?
 
     gurudwaraId String
     gurudwara   Gurudwara    @relation(fields: [gurudwaraId], references: [id], onDelete: Cascade)
@@ -156,6 +158,7 @@ model Journal {
     id          String  @id @default(cuid())
     title       String
     source      String?
+    content     String?
 
     gurudwaraId String
     gurudwara   Gurudwara    @relation(fields: [gurudwaraId], references: [id], onDelete: Cascade)

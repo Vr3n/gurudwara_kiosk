@@ -10,17 +10,10 @@ export const newsFormSchema = z.object({
   source: z.string().min(2, {
     message: "source not provided!",
   }),
+  description: z.string().optional(),
+  content: z.string(),
 });
 
-export const updateNewsFormSchema = z.object({
+export const updateNewsFormSchema = newsFormSchema.extend({
   id: z.string().cuid(),
-  gurudwaraId: z.string().min(2, {
-    message: "Gurudwara id not selected!",
-  }),
-  title: z.string().min(2, {
-    message: "title not provided!",
-  }),
-  source: z.string().min(2, {
-    message: "source not provided!",
-  }),
 });
