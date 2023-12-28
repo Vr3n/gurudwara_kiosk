@@ -11,9 +11,11 @@ import {
 import { Toggle } from "~/components/ui/toggle";
 import { fontSans } from "~/layouts/AdminBaseLayout";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
+import type { Session } from "next-auth";
 
 type AdminNavbarProps = {
   sidebarToggleFunc: () => void;
+  session?: Session | null;
 };
 
 /*
@@ -21,7 +23,7 @@ type AdminNavbarProps = {
  *
  * Takes in the toggle function for hide/show the sidebar.
  */
-const AdminNavbar = ({ sidebarToggleFunc }: AdminNavbarProps) => {
+const AdminNavbar = ({ sidebarToggleFunc, session }: AdminNavbarProps) => {
   return (
     <header className="flex h-16 justify-between border-b-zinc-300 p-4 shadow-sm">
       <section className="flex gap-4">
@@ -37,7 +39,14 @@ const AdminNavbar = ({ sidebarToggleFunc }: AdminNavbarProps) => {
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+              <AvatarImage
+                src={
+                  session?.user?.image
+                    ? session.user?.image
+                    : "https://www.svgrepo.com/show/452030/avatar-default.svg"
+                }
+                alt="user image"
+              />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>

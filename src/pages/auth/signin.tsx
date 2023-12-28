@@ -1,9 +1,19 @@
-import { UserAuthForm } from "~/components/forms/UserAuthForm";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { SignInFormData, UserAuthForm } from "~/components/forms/UserAuthForm";
 import { Card } from "~/components/ui/card";
 import { fontSans } from "~/layouts/AdminBaseLayout";
 import { cn } from "~/lib/utils";
 
 export default function SigninPage() {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  if (session) {
+    // Redirects to "/admin" page if the user is signed in.
+    router.push("/admin");
+  }
+
   return (
     <div
       className={cn(

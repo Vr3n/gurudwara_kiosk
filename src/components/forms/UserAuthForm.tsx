@@ -1,6 +1,5 @@
 import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import {
@@ -15,13 +14,13 @@ import { cn } from "~/lib/utils";
 import { userLoginSchema } from "~/schemas/userSchemas";
 import { buttonVariants } from "~/components/ui/button";
 import { Input } from "../ui/input";
-import { toast } from "react-toastify";
+import { signIn } from "next-auth/react";
+
+export type SignInFormData = z.infer<typeof userLoginSchema>;
 
 type UserAuthFormProps = {
   className?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
-
-type SignInFormData = z.infer<typeof userLoginSchema>;
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const form = useForm<SignInFormData>({
@@ -33,10 +32,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     mode: "onChange",
   });
 
-  const onSubmit = async (value: SignInFormData) => {
+  const params = useSearchParams();
+
+  const onSubmit = async (values: SignInFormData) => {
     await signIn("credentials", {
-      ...value,
-      redirect: true,
+      ...values,
+      callbackUrl: params.get("callbackUrl") ?? "/admin",
     });
   };
 
