@@ -15,6 +15,7 @@ import { cn } from "~/lib/utils";
 import { userLoginSchema } from "~/schemas/userSchemas";
 import { buttonVariants } from "~/components/ui/button";
 import { Input } from "../ui/input";
+import { toast } from "react-toastify";
 
 type UserAuthFormProps = {
   className?: string;
@@ -32,8 +33,11 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     mode: "onChange",
   });
 
-  const onSubmit = (value: SignInFormData) => {
-    console.log(value);
+  const onSubmit = async (value: SignInFormData) => {
+    await signIn("credentials", {
+      ...value,
+      redirect: true,
+    });
   };
 
   return (
