@@ -13,6 +13,9 @@ export const journalRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.db.journal.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        gurudwara: true,
+      },
     });
   }),
 

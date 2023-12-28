@@ -275,6 +275,9 @@ const LocationsHome = () => {
     setIsFormOpen(true);
   };
 
+  const { data: locationList, isLoading: isLocationLoading } =
+    api.location.getAll.useQuery();
+
   const closeForm = () => {
     setIsFormOpen(false);
   };
@@ -303,16 +306,31 @@ const LocationsHome = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead></TableHead>
+              <TableHead>city</TableHead>
+              <TableHead>gurudwara</TableHead>
+              <TableHead>longitude</TableHead>
+              <TableHead>latitude</TableHead>
+              <TableHead>state</TableHead>
+              <TableHead>country</TableHead>
+              <TableHead>zipcode</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell>{/* Your table content goes here */}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>No results.</TableCell>
-            </TableRow>
+            {isLocationLoading ? (
+              <p className="font-bold">Loading...</p>
+            ) : (
+              locationList?.map((location) => (
+                <TableRow key={location.id}>
+                  <TableCell>{location.city.name}</TableCell>
+                  <TableCell>{location.gurudwara.name}</TableCell>
+                  <TableCell>{location.longitude.toString()}</TableCell>
+                  <TableCell>{location.latitude.toString()}</TableCell>
+                  <TableCell>{location.state}</TableCell>
+                  <TableCell>{location.country}</TableCell>
+                  <TableCell>{location.zipcode}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

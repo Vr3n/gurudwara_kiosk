@@ -14,6 +14,10 @@ export const locationRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.db.location.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        city: true,
+        gurudwara: true,
+      },
     });
   }),
 
