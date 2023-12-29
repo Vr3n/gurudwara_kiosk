@@ -7,6 +7,7 @@ import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import Head from "next/head";
 import "mapbox-gl/dist/mapbox-gl.css";
+import "yet-another-react-lightbox/styles.css";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,

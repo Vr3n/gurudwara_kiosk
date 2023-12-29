@@ -49,6 +49,7 @@ const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
       gurudwaraId: "",
       title: "",
       source: "",
+      description: "",
     },
   });
 
@@ -119,15 +120,15 @@ const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
                       {isGurudwaraLoading
                         ? "Loading..."
                         : gurudwaraList?.map((gurudwara) => {
-                            return (
-                              <SelectItem
-                                key={gurudwara.id}
-                                value={gurudwara.id}
-                              >
-                                {gurudwara.name}
-                              </SelectItem>
-                            );
-                          })}
+                          return (
+                            <SelectItem
+                              key={gurudwara.id}
+                              value={gurudwara.id}
+                            >
+                              {gurudwara.name}
+                            </SelectItem>
+                          );
+                        })}
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -175,12 +176,33 @@ const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
             />
             <FormField
               control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="description"
+                      {...field}
+                      className="w-full rounded-md border border-gray-300 p-3"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    This is the description of your news.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="content"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
                     <CKEditor
+                      value={field.value}
                       onChange={(event, editor) => {
                         const data = editor.getData();
                         form.setValue("content", data);
@@ -253,6 +275,7 @@ const NewsHome = () => {
               <TableHead>title</TableHead>
               <TableHead>gurudwara</TableHead>
               <TableHead>source</TableHead>
+              <TableHead>description</TableHead>
               <TableHead>created at</TableHead>
             </TableRow>
           </TableHeader>
@@ -265,6 +288,7 @@ const NewsHome = () => {
                   <TableCell>{news.title}</TableCell>
                   <TableCell>{news.gurudwara.name}</TableCell>
                   <TableCell>{news.source}</TableCell>
+                  <TableCell>{news.description}</TableCell>
                   <TableCell>{news.createdAt.toLocaleString()}</TableCell>
                 </TableRow>
               ))

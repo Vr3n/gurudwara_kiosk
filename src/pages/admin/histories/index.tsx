@@ -114,15 +114,15 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                       {isGurudwaraLoading
                         ? "Loading..."
                         : gurudwaraList?.map((gurudwara) => {
-                            return (
-                              <SelectItem
-                                key={gurudwara.id}
-                                value={gurudwara.id}
-                              >
-                                {gurudwara.name}
-                              </SelectItem>
-                            );
-                          })}
+                          return (
+                            <SelectItem
+                              key={gurudwara.id}
+                              value={gurudwara.id}
+                            >
+                              {gurudwara.name}
+                            </SelectItem>
+                          );
+                        })}
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -163,6 +163,26 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   </FormControl>
                   <FormDescription>
                     This is the source of your history.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Source"
+                      {...field}
+                      className="w-full rounded-md border border-gray-300 p-3"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    This is the description of your history.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -246,6 +266,7 @@ const HistoriesHome = () => {
               <TableHead>title</TableHead>
               <TableHead>gurudwara</TableHead>
               <TableHead>source</TableHead>
+              <TableHead>description</TableHead>
               <TableHead>created at</TableHead>
             </TableRow>
           </TableHeader>
@@ -258,6 +279,7 @@ const HistoriesHome = () => {
                   <TableCell>{history.title}</TableCell>
                   <TableCell>{history.gurudwara.name}</TableCell>
                   <TableCell>{history.source}</TableCell>
+                  <TableCell>{history.description}</TableCell>
                   <TableCell>{history.createdAt.toLocaleString()}</TableCell>
                 </TableRow>
               ))

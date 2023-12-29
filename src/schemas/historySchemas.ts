@@ -8,6 +8,7 @@ export const historyFormSchema = z.object({
     message: "title not provided!",
   }),
   content: z.string(),
+  description: z.string(),
   source: z.string().min(2, {
     message: "source not provided!",
   }),
