@@ -118,15 +118,15 @@ const AddJournalForm: React.FC<JournalsHomeProps> = ({ onClose }) => {
                       {isGurudwaraLoading
                         ? "Loading..."
                         : gurudwaraList?.map((gurudwara) => {
-                            return (
-                              <SelectItem
-                                key={gurudwara.id}
-                                value={gurudwara.id}
-                              >
-                                {gurudwara.name}
-                              </SelectItem>
-                            );
-                          })}
+                          return (
+                            <SelectItem
+                              key={gurudwara.id}
+                              value={gurudwara.id}
+                            >
+                              {gurudwara.name}
+                            </SelectItem>
+                          );
+                        })}
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -167,6 +167,26 @@ const AddJournalForm: React.FC<JournalsHomeProps> = ({ onClose }) => {
                   </FormControl>
                   <FormDescription>
                     This is the source of your journal.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Source</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Description"
+                      {...field}
+                      className="w-full rounded-md border border-gray-300 p-3"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    This is the description of your journal.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -250,6 +270,7 @@ const JournalsHome = () => {
               <TableHead>title</TableHead>
               <TableHead>gurudwara</TableHead>
               <TableHead>source</TableHead>
+              <TableHead>description</TableHead>
               <TableHead>created at</TableHead>
             </TableRow>
           </TableHeader>
@@ -262,6 +283,7 @@ const JournalsHome = () => {
                   <TableCell>{journal.title}</TableCell>
                   <TableCell>{journal.gurudwara.name}</TableCell>
                   <TableCell>{journal.source}</TableCell>
+                  <TableCell>{journal.description}</TableCell>
                   <TableCell>{journal.createdAt.toLocaleString()}</TableCell>
                 </TableRow>
               ))

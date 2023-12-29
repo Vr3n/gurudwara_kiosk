@@ -2,33 +2,33 @@ import { Card } from "~/components/ui/card";
 import Image from "next/image";
 import { cn } from "~/lib/utils";
 import { DotOutline } from "@phosphor-icons/react";
-import type { Journal, Gurudwara } from "@prisma/client";
+import type { News, Gurudwara } from "@prisma/client";
 
-/* The Journal Card component.
+/* The News Card component.
  *
  * */
 type CardProps = React.ComponentProps<typeof Card>;
 
-type JournalCardProps = {
-  activeJournal: boolean;
+type NewsCardProps = {
+  activeNews: boolean;
   className?: string;
-  journal: Journal;
+  news: News;
   gurudwara: Gurudwara;
 } & CardProps;
 
-const JournalCard = ({
-  activeJournal,
+const NewsCard = ({
+  activeNews,
   className,
-  journal,
+  news,
   gurudwara,
   ...props
-}: JournalCardProps) => {
+}: NewsCardProps) => {
   return (
     <Card
       className={cn(
         "cursor-pointer  rounded-md",
         className,
-        activeJournal && "border-4 border-red-200 shadow-xl",
+        activeNews && "border-4 border-red-200 shadow-xl",
       )}
       {...props}
     >
@@ -43,11 +43,11 @@ const JournalCard = ({
           />
         </figure>
         <section className="flex flex-col gap-2 pt-2">
-          <h3 className="font-xl font-bold">{journal.title}</h3>
-          <p>{journal.description}</p>
+          <h3 className="font-xl font-bold">{news.title}</h3>
+          <p>{news.description}</p>
           <section className="flex items-center gap-2">
             <p className="font-semibold">
-              {journal.createdAt.toLocaleDateString()}
+              {news.createdAt.toLocaleDateString()}
             </p>
             <DotOutline size={24} color="#0c286a" weight="bold" />
             <p className="font-semibold">{gurudwara.name}</p>
@@ -58,4 +58,4 @@ const JournalCard = ({
   );
 };
 
-export default JournalCard;
+export default NewsCard;

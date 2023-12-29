@@ -10,6 +10,7 @@ export const journalFormSchema = z.object({
   source: z.string().min(2, {
     message: "source not provided!",
   }),
+  description: z.string(),
   content: z.string(),
 });
 
