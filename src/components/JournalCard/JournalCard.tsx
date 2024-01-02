@@ -32,18 +32,9 @@ const JournalCard = ({
       )}
       {...props}
     >
-      <div className="flex gap-4">
-        <figure>
-          <Image
-            className="rounded-md"
-            src={`https://picsum.photos/seed/picsum/200`}
-            height={100}
-            width={100}
-            alt="Photo"
-          />
-        </figure>
+      <div className="p-4">
         <section className="flex flex-col gap-2 pt-2">
-          <h3 className="font-xl font-bold">{journal.title}</h3>
+          <h3 className="font-2xl font-bold">{journal.title}</h3>
           <p>{journal.description}</p>
           <section className="flex items-center gap-2">
             <p className="font-semibold">

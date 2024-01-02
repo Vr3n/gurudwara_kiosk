@@ -169,6 +169,26 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
             />
             <FormField
               control={form.control}
+              name="street"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Street</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="street"
+                      {...field}
+                      className="w-full rounded-md border border-gray-300 p-3"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    This is the street of the location.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="latitude"
               render={({ field }) => (
                 <FormItem>

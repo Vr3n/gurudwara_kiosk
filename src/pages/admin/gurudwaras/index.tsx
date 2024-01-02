@@ -24,6 +24,7 @@ import {
 import { gurudwaraFormSchema } from "~/schemas/gurudwaraSchemas";
 import { toast } from "react-toastify";
 import { api } from "~/utils/api";
+import { UploadButton } from "~/utils/uploadthing";
 
 interface MessageFormProps {
   onClose: () => void;
@@ -50,7 +51,7 @@ const MessageForm: React.FC<MessageFormProps> = ({ onClose }) => {
   });
 
   const onSubmit = (value: GurudwaraFormType) => {
-    mutate({ name: value.name });
+    mutate(gurudwaraFormSchema.parse(value));
     onClose();
   };
 
@@ -93,6 +94,33 @@ const MessageForm: React.FC<MessageFormProps> = ({ onClose }) => {
                       placeholder="Name of gurudwara"
                       {...field}
                       className="w-full rounded-md border border-gray-300 p-3"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="image"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Image Upload</FormLabel>
+                  <FormControl>
+                    <UploadButton
+                      className="ut-button:bg-blue-500 ut-button:ut-readying:bg-blue-500/50"
+                      endpoint="gurudwaraImageUploader"
+                      onClientUploadComplete={(res) => {
+                        res.map((file) => {
+                          form.setValue("image", file.url);
+                        });
+                        toast.success(
+                          "You can submit the form. Image uploaded sucessfully!",
+                        );
+                      }}
+                      onUploadError={(error: Error) => {
+                        toast.error(`Error: ${error.message}`);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />

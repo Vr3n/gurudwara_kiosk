@@ -13,9 +13,21 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import KioskLocationBaseLayout from "~/layouts/KioskLocationBaseLayout";
-import { cn } from "~/lib/utils";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import JournalCard from "~/components/JournalCard/JournalCard";
+import { api } from "~/utils/api";
+import ReactPlayer from "react-player";
+import HistoryCard from "~/components/HistoryCard/HistoryCard";
+import NewsCard from "~/components/NewsCard/NewsCard";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+  DialogTitle,
+  DialogDescription,
+} from "~/components/ui/dialog";
+import RenderHtml from "~/components/RenderHtml/RenderHtml";
 
 /* The Journal Card component.
  *
@@ -24,7 +36,31 @@ type CardProps = React.ComponentProps<typeof Card>;
 
 const GurudwaraDetailPage = () => {
   const router = useRouter();
+
+  if (router.query.name === undefined) {
+    return <p>Loading...</p>;
+  }
+
+  const gurudwaraName: string = router.query.name as string;
+
+  const {
+    data: gurudwara,
+    isLoading: isGurudwaraLoading,
+    error: gurudwaraError,
+  } = api.gurudwara.getByName.useQuery(
+    { name: gurudwaraName },
+    {
+      refetchOnWindowFocus: false,
+    },
+  );
+
   const [activeJournal, setActiveJournal] = useState<number>(0);
+  const [activeNews, setActiveNews] = useState<number>(0);
+  const [activeHistory, setActiveHistory] = useState<number>(0);
+
+  if (isGurudwaraLoading) return <p>Loading...</p>;
+
+  if (gurudwaraError) return <p>Error loading the card...</p>;
 
   return (
     <div className="max-h-screen">
@@ -35,20 +71,23 @@ const GurudwaraDetailPage = () => {
               width="170"
               height="100"
               className="cursor-pointer rounded-md"
-              src="/Golden temple.png"
+              src={gurudwara?.image ?? "/Golden temple.png"}
               alt={"Gurudwara"}
             />
           </figure>
           <CardTitle className="w-96 text-4xl font-bold">
-            {router.query.name}
+            {gurudwara?.name}
             <CardDescription className="mt-6 flex gap-4 text-2xl">
               <MapPin size={24} weight="bold" />
-              <p className="font-medium">9350 17 Ave SE</p>
+              <p className="font-medium">
+                {gurudwara?.locations[0]?.street}{" "}
+                {gurudwara?.locations[0]?.city?.name}
+              </p>
             </CardDescription>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs>
+          <Tabs defaultValue={"image"}>
             <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger
                 className="relative inline-flex h-9 items-center justify-center whitespace-nowrap rounded-none border-b-2 border-b-transparent bg-transparent px-4 py-1 pb-3 pt-2 text-sm text-xl font-semibold text-muted-foreground shadow-none ring-offset-background transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:border-b-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-none"
@@ -90,12 +129,12 @@ const GurudwaraDetailPage = () => {
             <TabsContent value="image">
               <ScrollArea className="mt-4">
                 <div className="flex w-max gap-4">
-                  {[100, 232, 311, 34, 445, 116, 27, 88].map((i) => (
+                  {gurudwara?.images.map((image, i) => (
                     <figure key={i} className="shrink-0">
                       <div className="overflow-hidden rounded-md">
                         <Image
                           className="border-zinc-200"
-                          src={`https://picsum.photos/id/${i}/200`}
+                          src={`${image.url}`}
                           height={200}
                           width={200}
                           alt="Photo"
@@ -113,12 +152,103 @@ const GurudwaraDetailPage = () => {
             <TabsContent value="journals">
               <ScrollArea className="mt-4">
                 <div className=" flex h-96 flex-col gap-4 overflow-x-scroll">
-                  {[100, 232, 311, 34, 445, 116, 27, 88].map((i) => (
-                    <JournalCard
-                      activeJournal={activeJournal === i}
-                      onClick={() => setActiveJournal(i)}
-                      key={i}
+                  {gurudwara?.journals.map((journal, i) => (
+                    <Dialog key={i}>
+                      <DialogTrigger asChild>
+                        <JournalCard
+                          journal={journal}
+                          gurudwara={gurudwara}
+                          activeJournal={activeJournal === i}
+                          onClick={() => setActiveJournal(i)}
+                        />
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>{journal.title}</DialogTitle>
+                          <DialogDescription>
+                            {journal.description}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <RenderHtml
+                          html={journal?.content || "<p>Loading...</p>"}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  ))}
+                </div>
+                <ScrollBar orientation="vertical" />
+              </ScrollArea>
+            </TabsContent>
+            <TabsContent value="videos">
+              <ScrollArea className="mt-4">
+                <div className=" flex h-96 flex-col gap-4 overflow-x-scroll">
+                  {gurudwara?.videos.map((video) => (
+                    <ReactPlayer
+                      key={video.id}
+                      url={video.url}
+                      width={"100px"}
+                      height={"100px"}
                     />
+                  ))}
+                </div>
+                <ScrollBar orientation="vertical" />
+              </ScrollArea>
+            </TabsContent>
+            <TabsContent value="news">
+              <ScrollArea className="mt-4">
+                <div className=" flex h-96 flex-col gap-4 overflow-x-scroll">
+                  {gurudwara?.news.map((news, i) => (
+                    <Dialog key={i}>
+                      <DialogTrigger asChild>
+                        <NewsCard
+                          news={news}
+                          gurudwara={gurudwara}
+                          activeNews={activeNews === i}
+                          onClick={() => setActiveNews(i)}
+                        />
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>{news.title}</DialogTitle>
+                          <DialogDescription>
+                            {news.description}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <RenderHtml
+                          html={news?.content || "<p>Loading...</p>"}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  ))}
+                </div>
+                <ScrollBar orientation="vertical" />
+              </ScrollArea>
+            </TabsContent>
+            <TabsContent value="history">
+              <ScrollArea className="mt-4">
+                <div className=" flex h-96 flex-col gap-4 overflow-x-scroll">
+                  {gurudwara?.histories.map((history, i) => (
+                    <Dialog key={i}>
+                      <DialogTrigger asChild>
+                        <HistoryCard
+                          history={history}
+                          gurudwara={gurudwara}
+                          activeHistory={activeHistory === i}
+                          onClick={() => setActiveHistory(i)}
+                        />
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>{history.title}</DialogTitle>
+                          <DialogDescription>
+                            {history.description}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <RenderHtml
+                          html={history?.content || "<p>Loading...</p>"}
+                        />
+                      </DialogContent>
+                    </Dialog>
                   ))}
                 </div>
                 <ScrollBar orientation="vertical" />

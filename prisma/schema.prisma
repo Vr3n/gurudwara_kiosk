@@ -77,6 +77,7 @@ model VerificationToken {
 model Gurudwara {
     id          String  @id @default(cuid())
     name        String
+    image       String?
 
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
@@ -107,6 +108,7 @@ model City {
 
 model Location {
     id          String  @id @default(cuid())
+    street      String?
     state       String?
     country     String?
     zipcode     String?
