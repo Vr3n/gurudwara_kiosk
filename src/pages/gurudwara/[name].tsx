@@ -19,6 +19,15 @@ import { api } from "~/utils/api";
 import ReactPlayer from "react-player";
 import HistoryCard from "~/components/HistoryCard/HistoryCard";
 import NewsCard from "~/components/NewsCard/NewsCard";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+  DialogTitle,
+  DialogDescription,
+} from "~/components/ui/dialog";
+import RenderHtml from "~/components/RenderHtml/RenderHtml";
 
 /* The Journal Card component.
  *
@@ -62,7 +71,7 @@ const GurudwaraDetailPage = () => {
               width="170"
               height="100"
               className="cursor-pointer rounded-md"
-              src={gurudwara?.image || "/Golden temple.png"}
+              src={gurudwara?.image ?? "/Golden temple.png"}
               alt={"Gurudwara"}
             />
           </figure>
@@ -70,12 +79,15 @@ const GurudwaraDetailPage = () => {
             {gurudwara?.name}
             <CardDescription className="mt-6 flex gap-4 text-2xl">
               <MapPin size={24} weight="bold" />
-              <p className="font-medium">{gurudwara?.locations[0]?.city?.name}</p>
+              <p className="font-medium">
+                {gurudwara?.locations[0]?.street}{" "}
+                {gurudwara?.locations[0]?.city?.name}
+              </p>
             </CardDescription>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue={"image"} >
+          <Tabs defaultValue={"image"}>
             <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger
                 className="relative inline-flex h-9 items-center justify-center whitespace-nowrap rounded-none border-b-2 border-b-transparent bg-transparent px-4 py-1 pb-3 pt-2 text-sm text-xl font-semibold text-muted-foreground shadow-none ring-offset-background transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:border-b-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-none"
@@ -141,13 +153,27 @@ const GurudwaraDetailPage = () => {
               <ScrollArea className="mt-4">
                 <div className=" flex h-96 flex-col gap-4 overflow-x-scroll">
                   {gurudwara?.journals.map((journal, i) => (
-                    <JournalCard
-                      key={i}
-                      journal={journal}
-                      gurudwara={gurudwara}
-                      activeJournal={activeJournal === i}
-                      onClick={() => setActiveJournal(i)}
-                    />
+                    <Dialog key={i}>
+                      <DialogTrigger asChild>
+                        <JournalCard
+                          journal={journal}
+                          gurudwara={gurudwara}
+                          activeJournal={activeJournal === i}
+                          onClick={() => setActiveJournal(i)}
+                        />
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>{journal.title}</DialogTitle>
+                          <DialogDescription>
+                            {journal.description}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <RenderHtml
+                          html={journal?.content || "<p>Loading...</p>"}
+                        />
+                      </DialogContent>
+                    </Dialog>
                   ))}
                 </div>
                 <ScrollBar orientation="vertical" />
@@ -172,13 +198,27 @@ const GurudwaraDetailPage = () => {
               <ScrollArea className="mt-4">
                 <div className=" flex h-96 flex-col gap-4 overflow-x-scroll">
                   {gurudwara?.news.map((news, i) => (
-                    <NewsCard
-                      key={i}
-                      news={news}
-                      gurudwara={gurudwara}
-                      activeNews={activeNews === i}
-                      onClick={() => setActiveNews(i)}
-                    />
+                    <Dialog key={i}>
+                      <DialogTrigger asChild>
+                        <NewsCard
+                          news={news}
+                          gurudwara={gurudwara}
+                          activeNews={activeNews === i}
+                          onClick={() => setActiveNews(i)}
+                        />
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>{news.title}</DialogTitle>
+                          <DialogDescription>
+                            {news.description}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <RenderHtml
+                          html={news?.content || "<p>Loading...</p>"}
+                        />
+                      </DialogContent>
+                    </Dialog>
                   ))}
                 </div>
                 <ScrollBar orientation="vertical" />
@@ -188,13 +228,27 @@ const GurudwaraDetailPage = () => {
               <ScrollArea className="mt-4">
                 <div className=" flex h-96 flex-col gap-4 overflow-x-scroll">
                   {gurudwara?.histories.map((history, i) => (
-                    <HistoryCard
-                      key={i}
-                      history={history}
-                      gurudwara={gurudwara}
-                      activeHistory={activeHistory === i}
-                      onClick={() => setActiveHistory(i)}
-                    />
+                    <Dialog key={i}>
+                      <DialogTrigger asChild>
+                        <HistoryCard
+                          history={history}
+                          gurudwara={gurudwara}
+                          activeHistory={activeHistory === i}
+                          onClick={() => setActiveHistory(i)}
+                        />
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>{history.title}</DialogTitle>
+                          <DialogDescription>
+                            {history.description}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <RenderHtml
+                          html={history?.content || "<p>Loading...</p>"}
+                        />
+                      </DialogContent>
+                    </Dialog>
                   ))}
                 </div>
                 <ScrollBar orientation="vertical" />

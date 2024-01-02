@@ -10,15 +10,6 @@ import JournalCard from "~/components/JournalCard/JournalCard";
 import NewsCard from "~/components/NewsCard/NewsCard";
 import HistoryCard from "~/components/HistoryCard/HistoryCard";
 import { api } from "~/utils/api";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTrigger,
-  DialogTitle,
-  DialogDescription,
-} from "~/components/ui/dialog";
-import RenderHtml from "~/components/RenderHtml/RenderHtml";
 
 const LocationDetailPage = () => {
   const router = useRouter();
