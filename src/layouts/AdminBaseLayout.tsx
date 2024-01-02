@@ -12,6 +12,8 @@ import {
   BookBookmark,
   Barcode,
   GlobeStand,
+  Images,
+  MonitorPlay,
 } from "@phosphor-icons/react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -60,6 +62,16 @@ const sidebarItems: AdminSidebarProps["items"] = [
     href: "/admin/histories",
     title: "Histories",
     Icon: BookBookmark,
+  },
+  {
+    href: "/admin/images",
+    title: "Images",
+    Icon: Images,
+  },
+  {
+    href: "/admin/videos",
+    title: "Videos",
+    Icon: MonitorPlay,
   },
   {
     href: "/admin/fund-qrcodes",

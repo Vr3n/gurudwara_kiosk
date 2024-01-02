@@ -10,6 +10,9 @@ export const imageRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.db.image.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        gurudwara: true,
+      },
     });
   }),
 

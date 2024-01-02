@@ -115,11 +115,10 @@ const MessageForm: React.FC<MessageFormProps> = ({ onClose }) => {
 const GurudwarasHome = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const {
-    data: gurudwaraList,
-    isLoading: isGurudwaraLoading,
-    refetch: refetchGurudwaras,
-  } = api.gurudwara.getAll.useQuery();
+  const { data: gurudwaraList, isLoading: isGurudwaraLoading } =
+    api.gurudwara.getAll.useQuery(undefined, {
+      refetchOnWindowFocus: false,
+    });
 
   const openForm = () => {
     setIsFormOpen(true);

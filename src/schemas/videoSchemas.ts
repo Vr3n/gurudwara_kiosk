@@ -5,12 +5,9 @@ export const videoFormSchema = z.object({
     message: "Gurudwara id not selected!",
   }),
   url: z.string().url(),
+  name: z.string(),
 });
 
-export const updateVideoFormSchema = z.object({
+export const updateVideoFormSchema = videoFormSchema.extend({
   id: z.string().cuid(),
-  gurudwaraId: z.string().min(2, {
-    message: "Gurudwara id not selected!",
-  }),
-  url: z.string().url(),
 });
