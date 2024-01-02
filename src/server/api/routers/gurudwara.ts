@@ -2,6 +2,7 @@ import {
   gurudwaraFormSchema,
   updateGurudwaraFormSchema,
   searchByIdSchema,
+  searchByNameSchema,
 } from "~/schemas/gurudwaraSchemas";
 
 import {
@@ -23,6 +24,28 @@ export const gurudwaraRouter = createTRPCRouter({
       return ctx.db.gurudwara.findUnique({
         where: {
           id: input.id,
+        },
+      });
+    }),
+
+  getByName: publicProcedure
+    .input(searchByNameSchema)
+    .query(async ({ ctx, input }) => {
+      return ctx.db.gurudwara.findFirst({
+        where: {
+          name: input.name,
+        },
+        include: {
+          locations: {
+            include: {
+              city: true,
+            },
+          },
+          journals: true,
+          histories: true,
+          news: true,
+          images: true,
+          videos: true,
         },
       });
     }),
