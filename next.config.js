@@ -12,8 +12,14 @@ const config = {
       {
         protocol: "https",
         hostname: "picsum.photos",
+        pathname: "/**",
         port: "",
-        pathname: "/**"
+      },
+      {
+        protocol: "https",
+        hostname: "utfs.io",
+        pathname: "/**",
+        port: "",
       },
     ],
   },
@@ -26,9 +32,9 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
-  experimental:{
-    serverComponentsExternalPackages: ['@prisma/client', 'bcrypt']
-  }
+  experimental: {
+    serverComponentsExternalPackages: ["@prisma/client", "bcrypt"],
+  },
 };
 
 export default config;

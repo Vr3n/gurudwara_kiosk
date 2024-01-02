@@ -10,6 +10,9 @@ export const videoRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.db.video.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        gurudwara: true,
+      },
     });
   }),
 

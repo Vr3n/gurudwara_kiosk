@@ -2,7 +2,7 @@ import { type Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
 
 export default {
-  content: ["./src/**/*.tsx"],
+  content: ["./src/**/*.{ts,tsx,mdx}"],
   theme: {
     fontFamily: {
       sans: ["var(--font-sans)", ...fontFamily.sans],
@@ -71,8 +71,5 @@ export default {
       },
     },
   },
-  plugins: [
-    require("tailwindcss-animate"),
-    require('@tailwindcss/forms'),
-  ],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/forms")],
 } satisfies Config;

@@ -32,6 +32,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { UploadButton } from "~/utils/uploadthing";
+import Image from "next/image";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
 
 interface ImagesHomeProps {
   onClose: () => void;
@@ -42,8 +52,7 @@ const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose }) => {
     resolver: zodResolver(imageFormSchema),
     defaultValues: {
       gurudwaraId: "",
-      title: "",
-      source: "",
+      url: "",
     },
   });
 
@@ -51,7 +60,9 @@ const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose }) => {
     data: gurudwaraList,
     isLoading: isGurudwaraLoading,
     refetch: refetchGurudwaras,
-  } = api.gurudwara.getAll.useQuery();
+  } = api.gurudwara.getAll.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
 
   const { mutate } = api.image.create.useMutation({
     onSuccess: async () => {
@@ -71,7 +82,7 @@ const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose }) => {
 
   return (
     <Form {...form}>
-      <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
         <div className="w-full max-w-xl rounded-lg bg-white p-8 shadow-md">
           <div className="mb-4 flex justify-end">
             <Button onClick={onClose}>
@@ -107,25 +118,28 @@ const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose }) => {
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a gurudwara to attach the location to." />
-                      </SelectTrigger>
+                      <>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a gurudwara to attach the location to." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {isGurudwaraLoading
+                            ? "Loading..."
+                            : gurudwaraList?.map((gurudwara) => {
+                                return (
+                                  <SelectItem
+                                    key={gurudwara.id}
+                                    value={gurudwara.id}
+                                  >
+                                    {gurudwara.name}
+                                  </SelectItem>
+                                );
+                              })}
+                        </SelectContent>
+                      </>
                     </FormControl>
-                    <SelectContent>
-                      {isGurudwaraLoading
-                        ? "Loading..."
-                        : gurudwaraList?.map((gurudwara) => {
-                            return (
-                              <SelectItem
-                                key={gurudwara.id}
-                                value={gurudwara.id}
-                              >
-                                {gurudwara.name}
-                              </SelectItem>
-                            );
-                          })}
-                    </SelectContent>
                   </Select>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -134,13 +148,23 @@ const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose }) => {
               name="url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>Image Upload</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Title"
-                      type="image"
-                      {...field}
-                      className="w-full rounded-md border border-gray-300 p-3"
+                    <UploadButton
+                      className="ut-button:bg-blue-500 ut-button:ut-readying:bg-blue-500/50"
+                      endpoint="imageUploader"
+                      onClientUploadComplete={(res) => {
+                        res.map((file) => {
+                          form.setValue("url", file.url);
+                          form.setValue("name", file.name);
+                        });
+                        toast.success(
+                          "You can submit the form. Image uploaded sucessfully!",
+                        );
+                      }}
+                      onUploadError={(error: Error) => {
+                        toast.error(`Error: ${error.message}`);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -163,12 +187,21 @@ const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose }) => {
 const ImageHome = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
+  const {
+    data: imageList,
+    isLoading: isImageLoading,
+    refetch: refetchImageList,
+  } = api.image.getAll.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+
   const openForm = () => {
     setIsFormOpen(true);
   };
 
-  const closeForm = () => {
+  const closeForm = async () => {
     setIsFormOpen(false);
+    await refetchImageList();
   };
 
   return (
@@ -191,24 +224,52 @@ const ImageHome = () => {
 
         {isFormOpen && <AddImageForm onClose={closeForm} />}
       </div>
-
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell>{/* Your table content goes here */}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>No results.</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </div>
+      {isImageLoading ? (
+        <p className="font-bold">Loading...</p>
+      ) : (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Gurudwara</TableHead>
+                <TableHead>Url</TableHead>
+                <TableHead>Created At</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {imageList?.map((image) => (
+                <TableRow key={image.id}>
+                  <TableCell>{image.name}</TableCell>
+                  <TableCell>{image.gurudwara.name}</TableCell>
+                  <TableCell>
+                    <Dialog>
+                      <DialogTrigger>
+                        <Button>View Image</Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>{image.name}</DialogTitle>
+                          <DialogDescription>
+                            The photo uploaded for {image.gurudwara.name}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <Image
+                          src={image.url}
+                          alt={image.name ?? "image"}
+                          width={400}
+                          height={400}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </TableCell>
+                  <TableCell>{image.createdAt.toLocaleString()}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 };

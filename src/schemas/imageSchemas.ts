@@ -5,12 +5,9 @@ export const imageFormSchema = z.object({
     message: "Gurudwara id not selected!",
   }),
   url: z.string().url(),
+  name: z.string(),
 });
 
-export const updateImageFormSchema = z.object({
+export const updateImageFormSchema = imageFormSchema.extend({
   id: z.string().cuid(),
-  gurudwaraId: z.string().min(2, {
-    message: "Gurudwara id not selected!",
-  }),
-  url: z.string().url(),
 });
