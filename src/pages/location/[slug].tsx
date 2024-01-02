@@ -3,15 +3,22 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import KioskButton from "~/components/KioskButton/KioskButton";
 import { Separator } from "~/components/ui/separator";
-import { Card } from "~/components/ui/card";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import KioskLocationBaseLayout from "~/layouts/KioskLocationBaseLayout";
-import { cn } from "~/lib/utils";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import JournalCard from "~/components/JournalCard/JournalCard";
 import NewsCard from "~/components/NewsCard/NewsCard";
 import HistoryCard from "~/components/HistoryCard/HistoryCard";
 import { api } from "~/utils/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+  DialogTitle,
+  DialogDescription,
+} from "~/components/ui/dialog";
+import RenderHtml from "~/components/RenderHtml/RenderHtml";
 
 const LocationDetailPage = () => {
   const router = useRouter();
@@ -38,7 +45,7 @@ const LocationDetailPage = () => {
   const [activeHistory, setActiveHistory] = useState<number>(0);
 
   return (
-    <div className="max-h-screen">
+    <div className="max-h-[80%] overflow-y-scroll">
       <div className="grow rounded-md border-2 border-zinc-300 p-8 shadow-md">
         <h1 className="text-4xl font-bold">{router.query.slug}</h1>
         <Separator className="my-4 border border-zinc-400" />
@@ -74,7 +81,10 @@ const LocationDetailPage = () => {
                   journal={journal}
                   gurudwara={journal.gurudwara}
                   activeJournal={activeJournal === i}
-                  onClick={() => setActiveJournal(i)}
+                  onClick={async () => {
+                    setActiveJournal(i);
+                    await router.push(`/gurudwara/${journal.gurudwara.name}`);
+                  }}
                   key={i}
                 />
               ))}
@@ -94,7 +104,10 @@ const LocationDetailPage = () => {
                   news={news}
                   gurudwara={news.gurudwara}
                   activeNews={activeNews === i}
-                  onClick={() => setActiveNews(i)}
+                  onClick={async () => {
+                    setActiveNews(i);
+                    await router.push(`/gurudwara/${news.gurudwara.name}`);
+                  }}
                   key={i}
                 />
               ))}
@@ -114,7 +127,10 @@ const LocationDetailPage = () => {
                   history={history}
                   gurudwara={history.gurudwara}
                   activeHistory={activeHistory === i}
-                  onClick={() => setActiveHistory(i)}
+                  onClick={async () => {
+                    setActiveHistory(i);
+                    await router.push(`/gurudwara/${history.gurudwara.name}`);
+                  }}
                   key={i}
                 />
               ))}
