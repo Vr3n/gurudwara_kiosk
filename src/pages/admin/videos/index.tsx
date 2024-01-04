@@ -45,29 +45,25 @@ import ReactPlayer from "react-player";
 
 interface VideosHomeProps {
   onClose: () => void;
+  refetchFunc?: () => void;
 }
 
-const AddVideoForm: React.FC<VideosHomeProps> = ({ onClose }) => {
+const AddVideoForm: React.FC<VideosHomeProps> = ({ onClose, refetchFunc }) => {
   const form = useForm<z.infer<typeof videoFormSchema>>({
     resolver: zodResolver(videoFormSchema),
     defaultValues: {
       gurudwaraId: "",
-      url: "",
     },
   });
 
-  const {
-    data: gurudwaraList,
-    isLoading: isGurudwaraLoading,
-    refetch: refetchGurudwaras,
-  } = api.gurudwara.getAll.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-  });
+  const { data: gurudwaraList, isLoading: isGurudwaraLoading } =
+    api.gurudwara.getAll.useQuery(undefined, {
+      refetchOnWindowFocus: false,
+    });
 
   const { mutate } = api.video.create.useMutation({
     onSuccess: async () => {
       toast.success("Video added succesfully!");
-      await refetchGurudwaras();
     },
     onError: (error) => {
       console.log(error);
@@ -77,6 +73,11 @@ const AddVideoForm: React.FC<VideosHomeProps> = ({ onClose }) => {
 
   const onSubmit = (values: z.infer<typeof videoFormSchema>) => {
     mutate(videoFormSchema.parse(values));
+
+    if (typeof refetchFunc === "function") {
+      refetchFunc();
+    }
+
     onClose();
   };
 
@@ -126,15 +127,15 @@ const AddVideoForm: React.FC<VideosHomeProps> = ({ onClose }) => {
                           {isGurudwaraLoading
                             ? "Loading..."
                             : gurudwaraList?.map((gurudwara) => {
-                                return (
-                                  <SelectItem
-                                    key={gurudwara.id}
-                                    value={gurudwara.id}
-                                  >
-                                    {gurudwara.name}
-                                  </SelectItem>
-                                );
-                              })}
+                              return (
+                                <SelectItem
+                                  key={gurudwara.id}
+                                  value={gurudwara.id}
+                                >
+                                  {gurudwara.name}
+                                </SelectItem>
+                              );
+                            })}
                         </SelectContent>
                       </>
                     </FormControl>
@@ -201,7 +202,6 @@ const VideoHome = () => {
 
   const closeForm = async () => {
     setIsFormOpen(false);
-    await refetchVideoList();
   };
 
   return (
@@ -222,7 +222,9 @@ const VideoHome = () => {
           Add Video
         </Button>
 
-        {isFormOpen && <AddVideoForm onClose={closeForm} />}
+        {isFormOpen && (
+          <AddVideoForm refetchFunc={refetchVideoList} onClose={closeForm} />
+        )}
       </div>
       {isVideoLoading ? (
         <p className="font-bold">Loading...</p>

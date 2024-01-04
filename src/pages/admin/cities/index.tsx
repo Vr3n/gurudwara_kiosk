@@ -28,9 +28,10 @@ import { toast } from "react-toastify";
 
 interface CitysHomeProps {
   onClose: () => void;
+  refetchFunc?: () => void;
 }
 
-const AddCityForm: React.FC<CitysHomeProps> = ({ onClose }) => {
+const AddCityForm: React.FC<CitysHomeProps> = ({ onClose, refetchFunc }) => {
   const { mutate } = api.city.create.useMutation({
     onSuccess: async () => {
       toast.success("City Added successfully!");
@@ -53,6 +54,11 @@ const AddCityForm: React.FC<CitysHomeProps> = ({ onClose }) => {
 
   const onSubmit = (values: z.infer<typeof cityFormSchema>) => {
     mutate(cityFormSchema.parse(values));
+
+    if (typeof refetchFunc === "function") {
+      refetchFunc();
+    }
+
     onClose();
   };
 
@@ -173,8 +179,11 @@ const CitysHome = () => {
     setIsFormOpen(false);
   };
 
-  const { data: cityList, isLoading: isCityLoading } =
-    api.city.getAll.useQuery();
+  const {
+    data: cityList,
+    isLoading: isCityLoading,
+    refetch: cityRefetch,
+  } = api.city.getAll.useQuery();
 
   return (
     <div className="w-full">
@@ -193,7 +202,9 @@ const CitysHome = () => {
         >
           Add City
         </Button>
-        {isFormOpen && <AddCityForm onClose={closeForm} />}
+        {isFormOpen && (
+          <AddCityForm refetchFunc={cityRefetch} onClose={closeForm} />
+        )}
       </div>
 
       <div className="rounded-md border">

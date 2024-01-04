@@ -45,14 +45,14 @@ import {
 
 interface ImagesHomeProps {
   onClose: () => void;
+  refetchFunc?: () => void;
 }
 
-const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose }) => {
+const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose, refetchFunc }) => {
   const form = useForm<z.infer<typeof imageFormSchema>>({
     resolver: zodResolver(imageFormSchema),
     defaultValues: {
       gurudwaraId: "",
-      url: "",
     },
   });
 
@@ -77,6 +77,11 @@ const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose }) => {
 
   const onSubmit = (values: z.infer<typeof imageFormSchema>) => {
     mutate(imageFormSchema.parse(values));
+
+    if (typeof refetchFunc === "function") {
+      refetchFunc();
+    }
+
     onClose();
   };
 
@@ -126,15 +131,15 @@ const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose }) => {
                           {isGurudwaraLoading
                             ? "Loading..."
                             : gurudwaraList?.map((gurudwara) => {
-                                return (
-                                  <SelectItem
-                                    key={gurudwara.id}
-                                    value={gurudwara.id}
-                                  >
-                                    {gurudwara.name}
-                                  </SelectItem>
-                                );
-                              })}
+                              return (
+                                <SelectItem
+                                  key={gurudwara.id}
+                                  value={gurudwara.id}
+                                >
+                                  {gurudwara.name}
+                                </SelectItem>
+                              );
+                            })}
                         </SelectContent>
                       </>
                     </FormControl>
@@ -201,7 +206,6 @@ const ImageHome = () => {
 
   const closeForm = async () => {
     setIsFormOpen(false);
-    await refetchImageList();
   };
 
   return (
@@ -222,7 +226,9 @@ const ImageHome = () => {
           Add Image
         </Button>
 
-        {isFormOpen && <AddImageForm onClose={closeForm} />}
+        {isFormOpen && (
+          <AddImageForm refetchFunc={refetchImageList} onClose={closeForm} />
+        )}
       </div>
       {isImageLoading ? (
         <p className="font-bold">Loading...</p>

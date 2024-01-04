@@ -35,20 +35,21 @@ import { toast } from "react-toastify";
 
 interface LocationsHomeProps {
   onClose: () => void;
+  refetchFunc?: () => void;
 }
 
-const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
+const AddLocationForm: React.FC<LocationsHomeProps> = ({
+  onClose,
+  refetchFunc,
+}) => {
   const {
     data: gurudwaraList,
     isLoading: isGurudwaraLoading,
     refetch: refetchGurudwaras,
   } = api.gurudwara.getAll.useQuery();
 
-  const {
-    data: cityList,
-    isLoading: isCityLoading,
-    refetch: refetchCitys,
-  } = api.city.getAll.useQuery();
+  const { data: cityList, isLoading: isCityLoading } =
+    api.city.getAll.useQuery();
 
   const { mutate } = api.location.create.useMutation({
     onSuccess: async () => {
@@ -76,6 +77,11 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
 
   const onSubmit = (values: z.infer<typeof locationFormSchema>) => {
     mutate(locationFormSchema.parse(values));
+
+    if (typeof refetchFunc === "function") {
+      refetchFunc();
+    }
+
     onClose();
   };
 
@@ -123,15 +129,15 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
                       {isGurudwaraLoading
                         ? "Loading..."
                         : gurudwaraList?.map((gurudwara) => {
-                            return (
-                              <SelectItem
-                                key={gurudwara.id}
-                                value={gurudwara.id}
-                              >
-                                {gurudwara.name}
-                              </SelectItem>
-                            );
-                          })}
+                          return (
+                            <SelectItem
+                              key={gurudwara.id}
+                              value={gurudwara.id}
+                            >
+                              {gurudwara.name}
+                            </SelectItem>
+                          );
+                        })}
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -156,12 +162,12 @@ const AddLocationForm: React.FC<LocationsHomeProps> = ({ onClose }) => {
                       {isCityLoading
                         ? "Loading..."
                         : cityList?.map((city) => {
-                            return (
-                              <SelectItem key={city.id} value={city.id}>
-                                {city.name}
-                              </SelectItem>
-                            );
-                          })}
+                          return (
+                            <SelectItem key={city.id} value={city.id}>
+                              {city.name}
+                            </SelectItem>
+                          );
+                        })}
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -295,8 +301,11 @@ const LocationsHome = () => {
     setIsFormOpen(true);
   };
 
-  const { data: locationList, isLoading: isLocationLoading } =
-    api.location.getAll.useQuery();
+  const {
+    data: locationList,
+    isLoading: isLocationLoading,
+    refetch: locationRefetch,
+  } = api.location.getAll.useQuery();
 
   const closeForm = () => {
     setIsFormOpen(false);
@@ -319,7 +328,9 @@ const LocationsHome = () => {
         >
           Add Location
         </Button>
-        {isFormOpen && <AddLocationForm onClose={closeForm} />}
+        {isFormOpen && (
+          <AddLocationForm refetchFunc={locationRefetch} onClose={closeForm} />
+        )}
       </div>
 
       <div className="rounded-md border">

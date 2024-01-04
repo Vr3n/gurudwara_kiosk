@@ -36,9 +36,10 @@ import dynamic from "next/dynamic";
 
 interface NewssHomeProps {
   onClose: () => void;
+  refetchFunc?: () => void;
 }
 
-const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
+const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose, refetchFunc }) => {
   const CKEditor = dynamic(() => import("~/components/Editor/Editor"), {
     ssr: false,
   });
@@ -59,9 +60,8 @@ const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
     });
 
   const { mutate } = api.news.create.useMutation({
-    onSuccess: async () => {
+    onSuccess: () => {
       toast.success("News added succesfully!");
-      await refetchGurudwaras();
     },
     onError: (error) => {
       console.log(error);
@@ -71,12 +71,17 @@ const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
 
   const onSubmit = (values: z.infer<typeof newsFormSchema>) => {
     mutate(newsFormSchema.parse(values));
+
+    if (typeof refetchFunc === "function") {
+      refetchFunc();
+    }
+
     onClose();
   };
 
   return (
     <Form {...form}>
-      <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+      <div className="fixed inset-0 z-40 flex items-center justify-center bg-gray-800 bg-opacity-75">
         <div className="w-full max-w-xl rounded-lg bg-white p-8 shadow-md">
           <div className="mb-4 flex justify-end">
             <Button onClick={onClose}>
@@ -210,7 +215,7 @@ const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
                     />
                   </FormControl>
                   <FormDescription>
-                    This is the Description of your news.
+                    This is the content of your news.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -232,12 +237,13 @@ const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
 const NewsHome = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const { data: newsList, isLoading: isNewsLoading } = api.news.getAll.useQuery(
-    undefined,
-    {
-      refetchOnWindowFocus: false,
-    },
-  );
+  const {
+    data: newsList,
+    isLoading: isNewsLoading,
+    refetch: newRefetch,
+  } = api.news.getAll.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
 
   const openForm = () => {
     setIsFormOpen(true);
@@ -265,7 +271,9 @@ const NewsHome = () => {
           Add News
         </Button>
 
-        {isFormOpen && <AddNewsForm onClose={closeForm} />}
+        {isFormOpen && (
+          <AddNewsForm refetchFunc={newRefetch} onClose={closeForm} />
+        )}
       </div>
 
       <div className="rounded-md border">
