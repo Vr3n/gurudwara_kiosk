@@ -28,11 +28,12 @@ import { UploadButton } from "~/utils/uploadthing";
 
 interface MessageFormProps {
   onClose: () => void;
+  refetchFunc?: () => void;
 }
 
 type GurudwaraFormType = z.infer<typeof gurudwaraFormSchema>;
 
-const MessageForm: React.FC<MessageFormProps> = ({ onClose }) => {
+const MessageForm: React.FC<MessageFormProps> = ({ onClose, refetchFunc }) => {
   const form = useForm<GurudwaraFormType>({
     resolver: zodResolver(gurudwaraFormSchema),
     defaultValues: {
@@ -52,12 +53,17 @@ const MessageForm: React.FC<MessageFormProps> = ({ onClose }) => {
 
   const onSubmit = (value: GurudwaraFormType) => {
     mutate(gurudwaraFormSchema.parse(value));
+
+    if (typeof refetchFunc === "function") {
+      refetchFunc();
+    }
+
     onClose();
   };
 
   return (
     <Form {...form}>
-      <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
         <div className="w-full max-w-xl rounded-lg bg-white p-8 shadow-md">
           <div className="mb-4 flex justify-between">
             <p className="text-2xl">New Gurudwara</p>
@@ -88,12 +94,14 @@ const MessageForm: React.FC<MessageFormProps> = ({ onClose }) => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gurudwara name</FormLabel>
+                  <FormLabel className="text-xl font-medium">
+                    Gurudwara name
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Name of gurudwara"
                       {...field}
-                      className="w-full rounded-md border border-gray-300 p-3"
+                      className="mb-3 w-full rounded-md border border-gray-300 p-3"
                     />
                   </FormControl>
                   <FormMessage />
@@ -104,8 +112,8 @@ const MessageForm: React.FC<MessageFormProps> = ({ onClose }) => {
               control={form.control}
               name="image"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Image Upload</FormLabel>
+                <FormItem className="mt-4">
+                  <FormLabel className="text-xl font-medium">Image</FormLabel>
                   <FormControl>
                     <UploadButton
                       className="ut-button:bg-blue-500 ut-button:ut-readying:bg-blue-500/50"
@@ -143,10 +151,13 @@ const MessageForm: React.FC<MessageFormProps> = ({ onClose }) => {
 const GurudwarasHome = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const { data: gurudwaraList, isLoading: isGurudwaraLoading } =
-    api.gurudwara.getAll.useQuery(undefined, {
-      refetchOnWindowFocus: false,
-    });
+  const {
+    data: gurudwaraList,
+    isLoading: isGurudwaraLoading,
+    refetch: gurudwaraListRefetch,
+  } = api.gurudwara.getAll.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
 
   const openForm = () => {
     setIsFormOpen(true);
@@ -173,7 +184,9 @@ const GurudwarasHome = () => {
         >
           Add Gurudwara
         </Button>
-        {isFormOpen && <MessageForm onClose={closeForm} />}
+        {isFormOpen && (
+          <MessageForm onClose={closeForm} refetchFunc={gurudwaraListRefetch} />
+        )}
       </div>
 
       <div className="rounded-md border">

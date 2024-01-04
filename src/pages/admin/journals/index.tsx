@@ -36,9 +36,13 @@ import dynamic from "next/dynamic";
 
 interface JournalsHomeProps {
   onClose: () => void;
+  refetchFunc?: () => void;
 }
 
-const AddJournalForm: React.FC<JournalsHomeProps> = ({ onClose }) => {
+const AddJournalForm: React.FC<JournalsHomeProps> = ({
+  onClose,
+  refetchFunc,
+}) => {
   const CKEditor = dynamic(() => import("~/components/Editor/Editor"), {
     ssr: false,
   });
@@ -69,12 +73,17 @@ const AddJournalForm: React.FC<JournalsHomeProps> = ({ onClose }) => {
 
   const onSubmit = (values: z.infer<typeof journalFormSchema>) => {
     mutate(journalFormSchema.parse(values));
+
+    if (typeof refetchFunc === "function") {
+      refetchFunc();
+    }
+
     onClose();
   };
 
   return (
     <Form {...form}>
-      <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+      <div className="fixed inset-0 z-40 flex items-center justify-center bg-gray-800 bg-opacity-75">
         <div className="w-full max-w-xl rounded-lg bg-white p-8 shadow-md">
           <div className="mb-4 flex justify-end">
             <Button onClick={onClose}>
@@ -229,10 +238,13 @@ const AddJournalForm: React.FC<JournalsHomeProps> = ({ onClose }) => {
 const JournalsHome = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const { data: journalList, isLoading: isJournalLoading } =
-    api.journal.getAll.useQuery(undefined, {
-      refetchOnWindowFocus: false,
-    });
+  const {
+    data: journalList,
+    isLoading: isJournalLoading,
+    refetch: journalRefetch,
+  } = api.journal.getAll.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
 
   const openForm = () => {
     setIsFormOpen(true);
@@ -260,7 +272,9 @@ const JournalsHome = () => {
           Add Journal
         </Button>
 
-        {isFormOpen && <AddJournalForm onClose={closeForm} />}
+        {isFormOpen && (
+          <AddJournalForm refetchFunc={journalRefetch} onClose={closeForm} />
+        )}
       </div>
 
       <div className="rounded-md border">

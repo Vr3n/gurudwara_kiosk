@@ -4,7 +4,7 @@ export const gurudwaraFormSchema = z.object({
   name: z.string().min(2, {
     message: "Title must be at least 2 characters.",
   }),
-  image: z.string().url(),
+  image: z.string().url().optional(),
 });
 
 export const updateGurudwaraFormSchema = gurudwaraFormSchema.extend({

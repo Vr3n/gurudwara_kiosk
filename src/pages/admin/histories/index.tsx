@@ -34,7 +34,10 @@ import {
 } from "~/components/ui/select";
 import dynamic from "next/dynamic";
 
-const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+const AddHistoryForm: React.FC<{
+  onClose: () => void;
+  refetchFunc?: () => void;
+}> = ({ onClose, refetchFunc }) => {
   const CKEditor = dynamic(() => import("~/components/Editor/Editor"), {
     ssr: false,
   });
@@ -65,12 +68,17 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   const onSubmit = (values: z.infer<typeof historyFormSchema>) => {
     mutate(historyFormSchema.parse(values));
+
+    if (typeof refetchFunc === "function") {
+      refetchFunc();
+    }
+
     onClose();
   };
 
   return (
     <Form {...form}>
-      <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
         <div className="w-full max-w-xl rounded-lg bg-white p-8 shadow-md">
           <div className="mb-4 flex justify-end">
             <Button onClick={onClose}>
@@ -226,10 +234,13 @@ const AddHistoryForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 const HistoriesHome = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const { data: historyList, isLoading: isHistoryLoading } =
-    api.history.getAll.useQuery(undefined, {
-      refetchOnWindowFocus: false,
-    });
+  const {
+    data: historyList,
+    isLoading: isHistoryLoading,
+    refetch: historyRefetch,
+  } = api.history.getAll.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
 
   const openForm = () => {
     setIsFormOpen(true);
@@ -256,7 +267,9 @@ const HistoriesHome = () => {
         >
           Add History
         </Button>
-        {isFormOpen && <AddHistoryForm onClose={closeForm} />}
+        {isFormOpen && (
+          <AddHistoryForm refetchFunc={historyRefetch} onClose={closeForm} />
+        )}
       </div>
 
       <div className="rounded-md border">
