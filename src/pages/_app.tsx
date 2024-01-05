@@ -4,11 +4,17 @@ import { type AppType } from "next/app";
 
 import { api } from "~/utils/api";
 
+import "swiper/css";
+import "lightgallery/css/lightgallery.css";
+import "lightgallery/css/lg-zoom.css";
+import "lightgallery/css/lg-thumbnail.css";
 import "~/styles/globals.css";
 import Head from "next/head";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "yet-another-react-lightbox/styles.css";
 import "@uploadthing/react/styles.css";
+import { cn } from "~/lib/utils";
+import { fontSans } from "~/layouts/AdminBaseLayout";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -23,6 +29,11 @@ const MyApp: AppType<{ session: Session | null }> = ({
       <Head>
         <title>Sikh Society, Calgary</title>
         <meta name="description" content="Sikh Society calgary kiosk." />
+        <style jsx global>{`
+          html {
+            font-family: ${fontSans.style.fontFamily};
+          }
+        `}</style>
         <link
           rel="apple-touch-icon"
           sizes="114x114"
@@ -45,10 +56,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
-      {
-        // @ts-expect-error The get Layout error.
-        getLayout(<Component {...pageProps} />)
-      }
+      <div className={cn("font-sans", fontSans.variable)}>
+        {
+          // @ts-expect-error The get Layout error.
+          getLayout(<Component {...pageProps} />)
+        }
+      </div>
     </SessionProvider>
   );
 };

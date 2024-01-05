@@ -29,13 +29,8 @@ const KioskBaseLayout = ({ Icon, heading, children }: KioskBaseLayoutProps) => {
   return (
     <>
       {/* Container */}
-      <main
-        className={cn(
-          " mx-auto   max-w-screen-xl  font-sans",
-          fontSans.variable,
-        )}
-      >
-        <div className="flex min-h-screen flex-col px-4 py-8">
+      <main className={cn("font-sans", fontSans.variable)}>
+        <div className="flex h-screen flex-col px-4 py-8">
           {/* Heading */}
           <header className="flex justify-between">
             <Avatar className="h-24 w-32">

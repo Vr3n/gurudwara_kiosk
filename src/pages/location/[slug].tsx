@@ -1,7 +1,11 @@
-import { ArrowCircleRight, DotOutline } from "@phosphor-icons/react";
+import {
+  ArrowCircleLeft,
+  ArrowCircleRight,
+  HouseLine,
+} from "@phosphor-icons/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import KioskButton from "~/components/KioskButton/KioskButton";
+import KioskButton, { btnClasses } from "~/components/KioskButton/KioskButton";
 import { Separator } from "~/components/ui/separator";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import KioskLocationBaseLayout from "~/layouts/KioskLocationBaseLayout";
@@ -10,139 +14,157 @@ import JournalCard from "~/components/JournalCard/JournalCard";
 import NewsCard from "~/components/NewsCard/NewsCard";
 import HistoryCard from "~/components/HistoryCard/HistoryCard";
 import { api } from "~/utils/api";
+import { Button } from "~/components/ui/button";
+import { cn } from "~/lib/utils";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 const LocationDetailPage = () => {
   const router = useRouter();
 
-  const { data: journalList, isLoading: isJournalLoading } =
-    api.journal.getAll.useQuery(undefined, {
-      refetchOnWindowFocus: false,
-    });
+  const [activeJournal, setActiveJournal] = useState<string>("");
+  const [activeNews, setActiveNews] = useState<string>("");
+  const [activeHistory, setActiveHistory] = useState<string>("");
 
-  const { data: newsList, isLoading: isNewsLoading } = api.news.getAll.useQuery(
-    undefined,
+  const cityName: string = router.query.slug as string;
+
+  const {
+    data: cityData,
+    isLoading: isCityDataLoading,
+    error: cityDataError,
+  } = api.gurudwara.getByCityName.useQuery(
+    { name: cityName },
     {
       refetchOnWindowFocus: false,
     },
   );
 
-  const { data: historyList, isLoading: isHistoryLoading } =
-    api.history.getAll.useQuery(undefined, {
-      refetchOnWindowFocus: false,
-    });
+  if (isCityDataLoading) return <p>Loading...</p>;
 
-  const [activeJournal, setActiveJournal] = useState<number>(0);
-  const [activeNews, setActiveNews] = useState<number>(0);
-  const [activeHistory, setActiveHistory] = useState<number>(0);
+  if (cityDataError) return <p>Error loading the City...</p>;
 
   return (
-    <div className="max-h-[80%] overflow-y-scroll">
-      <div className="grow rounded-md border-2 border-zinc-300 p-8 shadow-md">
-        <h1 className="text-4xl font-bold">{router.query.slug}</h1>
-        <Separator className="my-4 border border-zinc-400" />
-        <p className="text-2xl font-semibold">Images</p>
-        <ScrollArea className="mt-4">
-          <div className="flex w-max gap-4">
-            {[100, 232, 311, 34, 445, 116, 27, 88].map((i) => (
-              <figure key={i} className="shrink-0">
-                <div className="overflow-hidden rounded-md">
-                  <Image
-                    className="border-zinc-200"
-                    src={`https://picsum.photos/id/${i}/200`}
-                    height={200}
-                    width={200}
-                    alt="Photo"
+    <div className="min-h-screen">
+      <div className="flex flex-col justify-between">
+        <div className="h-[90vh] overflow-y-scroll rounded-md border-2 border-zinc-300 p-8 shadow-md">
+          <h1 className="text-4xl font-bold">{cityName}</h1>
+          <Separator className="my-4 border border-zinc-400" />
+          <p className="text-2xl font-semibold">Images</p>
+          <Swiper spaceBetween={15} slidesPerView={4}>
+            <div className="flex w-max gap-4">
+              {cityData.map((gurudwara) => {
+                return gurudwara.images.map((image) => {
+                  return (
+                    <SwiperSlide
+                      onClick={async () => {
+                        await router.push(`/gurudwara/${gurudwara.name}`);
+                      }}
+                      key={image.id}
+                    >
+                      <figure className="shrink-0">
+                        <div className="overflow-hidden rounded-md">
+                          <Image
+                            className="border-zinc-200"
+                            src={image.url}
+                            height={400}
+                            width={400}
+                            alt="Photo"
+                          />
+                        </div>
+                      </figure>
+                    </SwiperSlide>
+                  );
+                });
+              })}
+            </div>
+          </Swiper>
+          <p className="mt-4 text-2xl font-semibold">Journals</p>
+          <Separator className="my-2 border border-zinc-200" />
+          <div className="max-h-96 overflow-y-scroll">
+            {cityData.map((gurudwara) => {
+              return gurudwara.journals.map((journal) => {
+                return (
+                  <JournalCard
+                    journal={journal}
+                    gurudwara={gurudwara}
+                    className={"mt-5"}
+                    activeJournal={activeJournal === journal.id}
+                    onClick={async () => {
+                      setActiveJournal(journal.id);
+                      await router.push(`/gurudwara/${gurudwara.name}`);
+                    }}
+                    key={journal.id}
                   />
-                </div>
-              </figure>
-            ))}
+                );
+              });
+            })}
           </div>
-          <ScrollBar
-            className="h-6 rounded-md bg-zinc-600 transition-all delay-150"
-            orientation="horizontal"
-          />
-        </ScrollArea>
-        <p className="mt-4 text-2xl font-semibold">Journals</p>
-        <ScrollArea className="mt-4">
-          {isJournalLoading && <p>Loading...</p>}
-          {journalList?.length !== 0 ? (
-            <div className=" flex h-96 flex-col gap-4 overflow-x-scroll">
-              {journalList?.map((journal, i) => (
-                <JournalCard
-                  journal={journal}
-                  gurudwara={journal.gurudwara}
-                  activeJournal={activeJournal === i}
-                  onClick={async () => {
-                    setActiveJournal(i);
-                    await router.push(`/gurudwara/${journal.gurudwara.name}`);
-                  }}
-                  key={i}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="text-2xl font-bold">No journal found!</p>
-          )}
-          <ScrollBar orientation="vertical" />
-        </ScrollArea>
-        <p className="mt-4 text-2xl font-semibold">News</p>
-        <ScrollArea className="mt-4">
-          {isNewsLoading && <p>Loading...</p>}
-          {newsList?.length !== 0 ? (
-            <div className=" flex h-96 flex-col gap-4 overflow-x-scroll">
-              {newsList?.map((news, i) => (
-                <NewsCard
-                  news={news}
-                  gurudwara={news.gurudwara}
-                  activeNews={activeNews === i}
-                  onClick={async () => {
-                    setActiveNews(i);
-                    await router.push(`/gurudwara/${news.gurudwara.name}`);
-                  }}
-                  key={i}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="text-2xl font-bold">No news found!</p>
-          )}
-          <ScrollBar orientation="vertical" />
-        </ScrollArea>
-        <p className="mt-4 text-2xl font-semibold">History</p>
-        <ScrollArea className="mt-4">
-          {isHistoryLoading && <p>Loading...</p>}
-          {historyList?.length !== 0 ? (
-            <div className=" flex h-96 flex-col gap-4 overflow-x-scroll">
-              {historyList?.map((history, i) => (
-                <HistoryCard
-                  history={history}
-                  gurudwara={history.gurudwara}
-                  activeHistory={activeHistory === i}
-                  onClick={async () => {
-                    setActiveHistory(i);
-                    await router.push(`/gurudwara/${history.gurudwara.name}`);
-                  }}
-                  key={i}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="text-2xl font-bold">No history found!</p>
-          )}
-          <ScrollBar orientation="vertical" />
-        </ScrollArea>
-      </div>
-      <footer className="mt-6">
-        <div className="flex justify-between">
-          <span></span>
-          <KioskButton
-            href="/location"
-            type="primary"
-            text="Next"
-            Icon={ArrowCircleRight}
-          />
+          <p className="mt-4 text-2xl font-semibold">News</p>
+          <Separator className="my-2 border border-zinc-200" />
+          <div className="max-h-96 overflow-y-scroll">
+            {cityData.map((gurudwara) => {
+              return gurudwara.news.map((news) => {
+                return (
+                  <NewsCard
+                    news={news}
+                    gurudwara={gurudwara}
+                    className={"mt-5"}
+                    activeNews={activeNews === news.id}
+                    onClick={async () => {
+                      setActiveNews(news.id);
+                      await router.push(`/gurudwara/${gurudwara.name}`);
+                    }}
+                    key={news.id}
+                  />
+                );
+              });
+            })}
+          </div>
+          <p className="mt-4 text-2xl font-semibold">History</p>
+          <Separator className="my-2 border border-zinc-200" />
+          <div className="max-h-80 overflow-y-scroll">
+            {cityData.map((gurudwara) => {
+              return gurudwara.histories.map((history) => {
+                return (
+                  <HistoryCard
+                    history={history}
+                    gurudwara={gurudwara}
+                    className={"mt-5"}
+                    activeHistory={activeHistory === history.id}
+                    onClick={async () => {
+                      setActiveHistory(history.id);
+                      await router.push(`/gurudwara/${gurudwara.name}`);
+                    }}
+                    key={history.id}
+                  />
+                );
+              });
+            })}
+          </div>
         </div>
-      </footer>
+        <footer className="mt-6">
+          <div className="flex justify-between">
+            <Button
+              className={cn(btnClasses.primary)}
+              onClick={() => router.back()}
+            >
+              <ArrowCircleLeft
+                size={24}
+                color={"#fff"}
+                weight="bold"
+                className="mr-4"
+              />{" "}
+              Back
+            </Button>
+            <KioskButton href="/" type="primary" text="Home" Icon={HouseLine} />
+            <KioskButton
+              href="/location"
+              type="primary"
+              text="Next"
+              Icon={ArrowCircleRight}
+            />
+          </div>
+        </footer>
+      </div>
     </div>
   );
 };

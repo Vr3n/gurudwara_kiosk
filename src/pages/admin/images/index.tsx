@@ -45,10 +45,9 @@ import {
 
 interface ImagesHomeProps {
   onClose: () => void;
-  refetchFunc?: () => void;
 }
 
-const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose, refetchFunc }) => {
+const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose }) => {
   const form = useForm<z.infer<typeof imageFormSchema>>({
     resolver: zodResolver(imageFormSchema),
     defaultValues: {
@@ -77,10 +76,6 @@ const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose, refetchFunc }) => {
 
   const onSubmit = (values: z.infer<typeof imageFormSchema>) => {
     mutate(imageFormSchema.parse(values));
-
-    if (typeof refetchFunc === "function") {
-      refetchFunc();
-    }
 
     onClose();
   };
@@ -131,15 +126,15 @@ const AddImageForm: React.FC<ImagesHomeProps> = ({ onClose, refetchFunc }) => {
                           {isGurudwaraLoading
                             ? "Loading..."
                             : gurudwaraList?.map((gurudwara) => {
-                              return (
-                                <SelectItem
-                                  key={gurudwara.id}
-                                  value={gurudwara.id}
-                                >
-                                  {gurudwara.name}
-                                </SelectItem>
-                              );
-                            })}
+                                return (
+                                  <SelectItem
+                                    key={gurudwara.id}
+                                    value={gurudwara.id}
+                                  >
+                                    {gurudwara.name}
+                                  </SelectItem>
+                                );
+                              })}
                         </SelectContent>
                       </>
                     </FormControl>
@@ -226,9 +221,7 @@ const ImageHome = () => {
           Add Image
         </Button>
 
-        {isFormOpen && (
-          <AddImageForm refetchFunc={refetchImageList} onClose={closeForm} />
-        )}
+        {isFormOpen && <AddImageForm onClose={closeForm} />}
       </div>
       {isImageLoading ? (
         <p className="font-bold">Loading...</p>

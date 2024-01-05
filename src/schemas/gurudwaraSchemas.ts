@@ -22,3 +22,7 @@ export const searchByIdSchema = z.object({
 export const searchByNameSchema = z.object({
   name: z.string({ required_error: "Gurudwara name not provided!" }),
 });
+
+export const searchByCityNameSchema = z.object({
+  name: z.string({ required_error: "City name not provided!" }),
+});

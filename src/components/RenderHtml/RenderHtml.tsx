@@ -11,7 +11,7 @@ const RenderHtml = ({
 }) => {
   return (
     <article
-      className={cn("prose", fontSans.variable, className)}
+      className={cn("font-sans prose", fontSans.variable, className)}
       dangerouslySetInnerHTML={{ __html: html }}
     ></article>
   );

@@ -14,17 +14,10 @@ const KioskLocationBaseLayout = ({
   children,
 }: KioskLocationBaseLayoutProps) => {
   return (
-    <>
-      {/* Container */}
-      <main
-        className={cn("mx-auto max-w-screen-xl font-sans", fontSans.variable)}
-      >
-        <div className="flex min-h-screen flex-col p-8">
-          {/* Content */}
-          <section className="min-h-screen grow">{children}</section>
-        </div>
-      </main>
-    </>
+    <main className={cn("font-sans", fontSans.variable)}>
+      {/* Content */}
+      <section className="p-8">{children}</section>
+    </main>
   );
 };
 

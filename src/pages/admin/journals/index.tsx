@@ -36,13 +36,9 @@ import dynamic from "next/dynamic";
 
 interface JournalsHomeProps {
   onClose: () => void;
-  refetchFunc?: () => void;
 }
 
-const AddJournalForm: React.FC<JournalsHomeProps> = ({
-  onClose,
-  refetchFunc,
-}) => {
+const AddJournalForm: React.FC<JournalsHomeProps> = ({ onClose }) => {
   const CKEditor = dynamic(() => import("~/components/Editor/Editor"), {
     ssr: false,
   });
@@ -74,17 +70,13 @@ const AddJournalForm: React.FC<JournalsHomeProps> = ({
   const onSubmit = (values: z.infer<typeof journalFormSchema>) => {
     mutate(journalFormSchema.parse(values));
 
-    if (typeof refetchFunc === "function") {
-      refetchFunc();
-    }
-
     onClose();
   };
 
   return (
     <Form {...form}>
       <div className="fixed inset-0 z-40 flex items-center justify-center bg-gray-800 bg-opacity-75">
-        <div className="w-full max-w-xl rounded-lg bg-white p-8 shadow-md">
+        <div className="w-full max-w-xl overflow-x-scroll rounded-lg bg-white p-8 shadow-md ">
           <div className="mb-4 flex justify-end">
             <Button onClick={onClose}>
               <svg
@@ -127,15 +119,15 @@ const AddJournalForm: React.FC<JournalsHomeProps> = ({
                       {isGurudwaraLoading
                         ? "Loading..."
                         : gurudwaraList?.map((gurudwara) => {
-                          return (
-                            <SelectItem
-                              key={gurudwara.id}
-                              value={gurudwara.id}
-                            >
-                              {gurudwara.name}
-                            </SelectItem>
-                          );
-                        })}
+                            return (
+                              <SelectItem
+                                key={gurudwara.id}
+                                value={gurudwara.id}
+                              >
+                                {gurudwara.name}
+                              </SelectItem>
+                            );
+                          })}
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -186,7 +178,7 @@ const AddJournalForm: React.FC<JournalsHomeProps> = ({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Source</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Description"
@@ -205,7 +197,7 @@ const AddJournalForm: React.FC<JournalsHomeProps> = ({
               control={form.control}
               name="content"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="h-96 overflow-x-scroll">
                   <FormLabel>Content</FormLabel>
                   <FormControl>
                     <CKEditor
@@ -272,9 +264,7 @@ const JournalsHome = () => {
           Add Journal
         </Button>
 
-        {isFormOpen && (
-          <AddJournalForm refetchFunc={journalRefetch} onClose={closeForm} />
-        )}
+        {isFormOpen && <AddJournalForm onClose={closeForm} />}
       </div>
 
       <div className="rounded-md border">

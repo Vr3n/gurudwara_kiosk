@@ -1,4 +1,8 @@
-import { cityFormSchema, updateCityFormSchema } from "~/schemas/citiesSchemas";
+import {
+  cityFormSchema,
+  searchByCityNameSchema,
+  updateCityFormSchema,
+} from "~/schemas/citiesSchemas";
 
 import {
   createTRPCRouter,

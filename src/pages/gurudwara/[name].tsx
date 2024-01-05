@@ -1,7 +1,13 @@
-import { ArrowCircleRight, DotOutline, MapPin } from "@phosphor-icons/react";
+import {
+  ArrowCircleLeft,
+  ArrowCircleRight,
+  DotOutline,
+  HouseLine,
+  MapPin,
+} from "@phosphor-icons/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import KioskButton from "~/components/KioskButton/KioskButton";
+import KioskButton, { btnClasses } from "~/components/KioskButton/KioskButton";
 import { Separator } from "~/components/ui/separator";
 import {
   Card,
@@ -28,6 +34,20 @@ import {
   DialogDescription,
 } from "~/components/ui/dialog";
 import RenderHtml from "~/components/RenderHtml/RenderHtml";
+import { Button } from "~/components/ui/button";
+import { cn } from "~/lib/utils";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { fontSans } from "~/layouts/AdminBaseLayout";
+import LightGallery from "lightgallery/react";
+
+import lgThumbnail from "lightgallery/plugins/thumbnail";
+import video from "lightgallery/plugins/video";
+import lgZoom from "lightgallery/plugins/zoom";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "~/components/ui/carousel";
 
 /* The Journal Card component.
  *
@@ -63,8 +83,8 @@ const GurudwaraDetailPage = () => {
   if (gurudwaraError) return <p>Error loading the card...</p>;
 
   return (
-    <div className="max-h-screen">
-      <div className="grow rounded-md border-2 border-zinc-300 p-8 shadow-md">
+    <div className="flex h-screen flex-col">
+      <div className="h-[90%] rounded-md border-2 border-zinc-300 p-8 shadow-md">
         <CardHeader className="flex flex-row gap-4">
           <figure>
             <Image
@@ -88,7 +108,7 @@ const GurudwaraDetailPage = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue={"image"}>
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger
                 className="relative inline-flex h-9 items-center justify-center whitespace-nowrap rounded-none border-b-2 border-b-transparent bg-transparent px-4 py-1 pb-3 pt-2 text-sm text-xl font-semibold text-muted-foreground shadow-none ring-offset-background transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:border-b-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 value="image"
@@ -119,95 +139,87 @@ const GurudwaraDetailPage = () => {
               >
                 History
               </TabsTrigger>
-              <TabsTrigger
-                className="relative  inline-flex h-9 items-center justify-center whitespace-nowrap rounded-none border-b-2 border-b-transparent bg-transparent px-4 py-1 pb-3 pt-2 text-sm text-xl font-semibold text-muted-foreground shadow-none ring-offset-background transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:border-b-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-none"
-                value="more"
-              >
-                More
-              </TabsTrigger>
             </TabsList>
-            <TabsContent value="image">
-              <ScrollArea className="mt-4">
-                <div className="flex w-max gap-4">
-                  {gurudwara?.images.map((image, i) => (
-                    <figure key={i} className="shrink-0">
-                      <div className="overflow-hidden rounded-md">
-                        <Image
-                          className="border-zinc-200"
-                          src={`${image.url}`}
-                          height={200}
-                          width={200}
-                          alt="Photo"
-                        />
-                      </div>
-                    </figure>
-                  ))}
-                </div>
-                <ScrollBar
-                  className="h-6 rounded-md bg-zinc-600 transition-all delay-150"
-                  orientation="horizontal"
-                />
-              </ScrollArea>
+            <TabsContent value="image" className="h-[60%]">
+              <LightGallery
+                speed={150}
+                elementClassNames="grid grid-cols-3 gap-6 justify-between mt-4 overflow-y-scroll h-[60rem]"
+                plugins={[lgThumbnail]}
+              >
+                {gurudwara?.images.map((image) => (
+                  <a href={image.url}>
+                    <Image
+                      className="rounded-lg border-zinc-200"
+                      src={image.url}
+                      height={600}
+                      width={600}
+                      alt="Photo"
+                    />
+                  </a>
+                ))}
+              </LightGallery>
             </TabsContent>
-            <TabsContent value="journals">
-              <ScrollArea className="mt-4">
-                <div className=" flex h-96 flex-col gap-4 overflow-x-scroll">
-                  {gurudwara?.journals.map((journal, i) => (
-                    <Dialog key={i}>
-                      <DialogTrigger asChild>
-                        <JournalCard
-                          journal={journal}
-                          gurudwara={gurudwara}
-                          activeJournal={activeJournal === i}
-                          onClick={() => setActiveJournal(i)}
-                        />
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>{journal.title}</DialogTitle>
-                          <DialogDescription>
-                            {journal.description}
-                          </DialogDescription>
-                        </DialogHeader>
-                        <RenderHtml
-                          html={journal?.content || "<p>Loading...</p>"}
-                        />
-                      </DialogContent>
-                    </Dialog>
-                  ))}
-                </div>
-                <ScrollBar orientation="vertical" />
-              </ScrollArea>
+            <TabsContent value="journals" className="h-full">
+              <div className=" flex h-[60rem] flex-col content-stretch justify-between gap-4 overflow-y-scroll">
+                {gurudwara?.journals.map((journal, i) => (
+                  <Dialog key={i}>
+                    <DialogTrigger asChild>
+                      <JournalCard
+                        journal={journal}
+                        className="h-full"
+                        gurudwara={gurudwara}
+                        activeJournal={activeJournal === i}
+                        onClick={() => setActiveJournal(i)}
+                      />
+                    </DialogTrigger>
+                    <DialogContent
+                      className={cn("font-sans", fontSans.variable)}
+                    >
+                      <DialogHeader>
+                        <DialogTitle>{journal.title}</DialogTitle>
+                        <DialogDescription>
+                          {journal.description}
+                        </DialogDescription>
+                      </DialogHeader>
+                      <RenderHtml
+                        html={journal?.content ?? "<p>Loading...</p>"}
+                      />
+                    </DialogContent>
+                  </Dialog>
+                ))}
+              </div>
             </TabsContent>
-            <TabsContent value="videos">
-              <ScrollArea className="mt-4">
-                <div className=" flex h-96 flex-col gap-4 overflow-x-scroll">
-                  {gurudwara?.videos.map((video) => (
+            <TabsContent value="videos" className="h-full">
+              <Swiper spaceBetween={5} slidesPerView={4}>
+                {gurudwara?.videos.map((video) => (
+                  <SwiperSlide key={video.id}>
                     <ReactPlayer
                       key={video.id}
                       url={video.url}
-                      width={"100px"}
-                      height={"100px"}
+                      width={"200px"}
+                      height={"200px"}
                     />
-                  ))}
-                </div>
-                <ScrollBar orientation="vertical" />
-              </ScrollArea>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
             </TabsContent>
-            <TabsContent value="news">
+            <TabsContent value="news" className="h-full">
               <ScrollArea className="mt-4">
-                <div className=" flex h-96 flex-col gap-4 overflow-x-scroll">
+                <div className=" flex h-[60rem] flex-col content-stretch gap-4 overflow-y-scroll">
                   {gurudwara?.news.map((news, i) => (
                     <Dialog key={i}>
                       <DialogTrigger asChild>
                         <NewsCard
                           news={news}
                           gurudwara={gurudwara}
+                          className="h-full"
                           activeNews={activeNews === i}
                           onClick={() => setActiveNews(i)}
                         />
                       </DialogTrigger>
-                      <DialogContent>
+                      <DialogContent
+                        className={cn("font-sans", fontSans.variable)}
+                      >
                         <DialogHeader>
                           <DialogTitle>{news.title}</DialogTitle>
                           <DialogDescription>
@@ -215,7 +227,7 @@ const GurudwaraDetailPage = () => {
                           </DialogDescription>
                         </DialogHeader>
                         <RenderHtml
-                          html={news?.content || "<p>Loading...</p>"}
+                          html={news?.content ?? "<p>Loading...</p>"}
                         />
                       </DialogContent>
                     </Dialog>
@@ -224,20 +236,23 @@ const GurudwaraDetailPage = () => {
                 <ScrollBar orientation="vertical" />
               </ScrollArea>
             </TabsContent>
-            <TabsContent value="history">
-              <ScrollArea className="mt-4">
-                <div className=" flex h-96 flex-col gap-4 overflow-x-scroll">
+            <TabsContent value="history" className="h-full">
+              <ScrollArea className="mt-4 h-full">
+                <div className=" flex h-[60rem] flex-col content-stretch gap-4 overflow-y-scroll">
                   {gurudwara?.histories.map((history, i) => (
                     <Dialog key={i}>
                       <DialogTrigger asChild>
                         <HistoryCard
                           history={history}
                           gurudwara={gurudwara}
+                          className="h-full"
                           activeHistory={activeHistory === i}
                           onClick={() => setActiveHistory(i)}
                         />
                       </DialogTrigger>
-                      <DialogContent>
+                      <DialogContent
+                        className={cn("font-sans", fontSans.variable)}
+                      >
                         <DialogHeader>
                           <DialogTitle>{history.title}</DialogTitle>
                           <DialogDescription>
@@ -245,7 +260,7 @@ const GurudwaraDetailPage = () => {
                           </DialogDescription>
                         </DialogHeader>
                         <RenderHtml
-                          html={history?.content || "<p>Loading...</p>"}
+                          html={history?.content ?? "<p>Loading...</p>"}
                         />
                       </DialogContent>
                     </Dialog>
@@ -259,10 +274,23 @@ const GurudwaraDetailPage = () => {
       </div>
       <footer className="mt-6">
         <div className="flex justify-between">
-          <span></span>
+          <Button
+            className={cn(btnClasses.primary)}
+            onClick={() => router.back()}
+          >
+            <ArrowCircleLeft
+              size={24}
+              color={"#fff"}
+              weight="bold"
+              className="mr-4"
+            />{" "}
+            Back
+          </Button>
+          <KioskButton href="/" type="primary" text="Home" Icon={HouseLine} />
           <KioskButton
             href="/location"
             type="primary"
+            disabled={true}
             text="Next"
             Icon={ArrowCircleRight}
           />
@@ -280,3 +308,31 @@ GurudwaraDetailPage.getLayout = (page: any) => (
 );
 
 export default GurudwaraDetailPage;
+{
+  /*
+              <ScrollArea className="mt-4">
+                <Swiper spaceBetween={5} slidesPerView={4}>
+                  {gurudwara?.images.map((image) => (
+                    <SwiperSlide key={image.id}>
+                      <figure className="shrink-0">
+                        <div className="overflow-hidden rounded-md">
+                          <Image
+                            className="border-zinc-200"
+                            src={image.url}
+                            height={600}
+                            width={600}
+                            alt="Photo"
+                          />
+                        </div>
+                      </figure>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+                <ScrollBar
+                  className="h-6 rounded-md bg-zinc-600 transition-all delay-150"
+                  orientation="horizontal"
+                />
+              </ScrollArea>
+   *
+   * */
+}
