@@ -41,13 +41,6 @@ import { fontSans } from "~/layouts/AdminBaseLayout";
 import LightGallery from "lightgallery/react";
 
 import lgThumbnail from "lightgallery/plugins/thumbnail";
-import video from "lightgallery/plugins/video";
-import lgZoom from "lightgallery/plugins/zoom";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "~/components/ui/carousel";
 
 /* The Journal Card component.
  *
