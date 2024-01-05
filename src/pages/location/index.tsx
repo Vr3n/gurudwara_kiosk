@@ -160,17 +160,18 @@ export default function LocationPage() {
   }
 
   return (
-    <>
-      <div className="flex gap-4">
+    <div className="flex h-full flex-col justify-between">
+      <div className="flex h-full gap-4">
         {/* Map Grid */}
         <div className="grow rounded-md border-2 border-zinc-300 p-2">
           {!!activeLocation && <LocationMap activeLocation={activeLocation} />}
         </div>
         {/* Location Buttons */}
-        <div className="flex w-1/4 flex-col gap-4">
+        <div className="flex h-full w-1/4 flex-col gap-4">
           {cityList?.map((city) => (
             <LocationNameCard
               key={city.name}
+              className={"h-full"}
               activeLocation={activeLocation?.name ?? ""}
               onClick={() => setActiveLocation(city)}
               locationName={city.name}
@@ -213,7 +214,7 @@ export default function LocationPage() {
           </div>
         ) : null}
       </footer>
-    </>
+    </div>
   );
 }
 

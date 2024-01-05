@@ -1,6 +1,7 @@
 import {
   gurudwaraFormSchema,
   updateGurudwaraFormSchema,
+  searchByCityNameSchema,
   searchByIdSchema,
   searchByNameSchema,
 } from "~/schemas/gurudwaraSchemas";
@@ -25,6 +26,10 @@ export const gurudwaraRouter = createTRPCRouter({
         where: {
           id: input.id,
         },
+        include: {
+          images: true,
+          videos: true,
+        }
       });
     }),
 
@@ -48,6 +53,29 @@ export const gurudwaraRouter = createTRPCRouter({
           videos: true,
         },
       });
+    }),
+
+  getByCityName: publicProcedure
+    .input(searchByCityNameSchema)
+    .query(async ({ ctx, input }) => {
+      return ctx.db.gurudwara.findMany({
+        where: {
+          locations: {
+            every: {
+              city: {
+                name: input.name
+              }
+            }
+          }
+        },
+        include: {
+          histories: true,
+          news: true,
+          journals: true,
+          videos: true,
+          images: true
+        }
+      })
     }),
 
   create: protectedProcedure

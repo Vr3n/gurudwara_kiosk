@@ -45,10 +45,9 @@ import ReactPlayer from "react-player";
 
 interface VideosHomeProps {
   onClose: () => void;
-  refetchFunc?: () => void;
 }
 
-const AddVideoForm: React.FC<VideosHomeProps> = ({ onClose, refetchFunc }) => {
+const AddVideoForm: React.FC<VideosHomeProps> = ({ onClose }) => {
   const form = useForm<z.infer<typeof videoFormSchema>>({
     resolver: zodResolver(videoFormSchema),
     defaultValues: {
@@ -74,9 +73,6 @@ const AddVideoForm: React.FC<VideosHomeProps> = ({ onClose, refetchFunc }) => {
   const onSubmit = (values: z.infer<typeof videoFormSchema>) => {
     mutate(videoFormSchema.parse(values));
 
-    if (typeof refetchFunc === "function") {
-      refetchFunc();
-    }
 
     onClose();
   };
@@ -223,7 +219,7 @@ const VideoHome = () => {
         </Button>
 
         {isFormOpen && (
-          <AddVideoForm refetchFunc={refetchVideoList} onClose={closeForm} />
+          <AddVideoForm onClose={closeForm} />
         )}
       </div>
       {isVideoLoading ? (

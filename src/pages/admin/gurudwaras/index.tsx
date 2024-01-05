@@ -28,12 +28,11 @@ import { UploadButton } from "~/utils/uploadthing";
 
 interface MessageFormProps {
   onClose: () => void;
-  refetchFunc?: () => void;
 }
 
 type GurudwaraFormType = z.infer<typeof gurudwaraFormSchema>;
 
-const MessageForm: React.FC<MessageFormProps> = ({ onClose, refetchFunc }) => {
+const MessageForm: React.FC<MessageFormProps> = ({ onClose }) => {
   const form = useForm<GurudwaraFormType>({
     resolver: zodResolver(gurudwaraFormSchema),
     defaultValues: {
@@ -54,9 +53,6 @@ const MessageForm: React.FC<MessageFormProps> = ({ onClose, refetchFunc }) => {
   const onSubmit = (value: GurudwaraFormType) => {
     mutate(gurudwaraFormSchema.parse(value));
 
-    if (typeof refetchFunc === "function") {
-      refetchFunc();
-    }
 
     onClose();
   };
@@ -185,7 +181,7 @@ const GurudwarasHome = () => {
           Add Gurudwara
         </Button>
         {isFormOpen && (
-          <MessageForm onClose={closeForm} refetchFunc={gurudwaraListRefetch} />
+          <MessageForm onClose={closeForm} />
         )}
       </div>
 

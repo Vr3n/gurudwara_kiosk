@@ -53,8 +53,8 @@ export default function Home() {
   const [activeLanguage, setActiveLanguage] = useState<string>("English");
 
   return (
-    <>
-      <div className="grid grid-cols-1  gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="flex h-full flex-col justify-between">
+      <div className="grid h-[60vh] grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {Languages.map((item) => (
           <LanguageSelectorCard
             className="h-full"
@@ -79,7 +79,7 @@ export default function Home() {
           </div>
         ) : null}
       </footer>
-    </>
+    </div>
   );
 }
 

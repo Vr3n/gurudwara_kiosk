@@ -36,10 +36,9 @@ import dynamic from "next/dynamic";
 
 interface NewssHomeProps {
   onClose: () => void;
-  refetchFunc?: () => void;
 }
 
-const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose, refetchFunc }) => {
+const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose }) => {
   const CKEditor = dynamic(() => import("~/components/Editor/Editor"), {
     ssr: false,
   });
@@ -71,10 +70,6 @@ const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose, refetchFunc }) => {
 
   const onSubmit = (values: z.infer<typeof newsFormSchema>) => {
     mutate(newsFormSchema.parse(values));
-
-    if (typeof refetchFunc === "function") {
-      refetchFunc();
-    }
 
     onClose();
   };
@@ -203,7 +198,7 @@ const AddNewsForm: React.FC<NewssHomeProps> = ({ onClose, refetchFunc }) => {
               control={form.control}
               name="content"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="h-96 overflow-x-scroll">
                   <FormLabel>Content</FormLabel>
                   <FormControl>
                     <CKEditor
@@ -271,9 +266,7 @@ const NewsHome = () => {
           Add News
         </Button>
 
-        {isFormOpen && (
-          <AddNewsForm refetchFunc={newRefetch} onClose={closeForm} />
-        )}
+        {isFormOpen && <AddNewsForm onClose={closeForm} />}
       </div>
 
       <div className="rounded-md border">

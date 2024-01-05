@@ -36,8 +36,7 @@ import dynamic from "next/dynamic";
 
 const AddHistoryForm: React.FC<{
   onClose: () => void;
-  refetchFunc?: () => void;
-}> = ({ onClose, refetchFunc }) => {
+}> = ({ onClose }) => {
   const CKEditor = dynamic(() => import("~/components/Editor/Editor"), {
     ssr: false,
   });
@@ -68,10 +67,6 @@ const AddHistoryForm: React.FC<{
 
   const onSubmit = (values: z.infer<typeof historyFormSchema>) => {
     mutate(historyFormSchema.parse(values));
-
-    if (typeof refetchFunc === "function") {
-      refetchFunc();
-    }
 
     onClose();
   };
@@ -122,15 +117,15 @@ const AddHistoryForm: React.FC<{
                       {isGurudwaraLoading
                         ? "Loading..."
                         : gurudwaraList?.map((gurudwara) => {
-                          return (
-                            <SelectItem
-                              key={gurudwara.id}
-                              value={gurudwara.id}
-                            >
-                              {gurudwara.name}
-                            </SelectItem>
-                          );
-                        })}
+                            return (
+                              <SelectItem
+                                key={gurudwara.id}
+                                value={gurudwara.id}
+                              >
+                                {gurudwara.name}
+                              </SelectItem>
+                            );
+                          })}
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -200,7 +195,7 @@ const AddHistoryForm: React.FC<{
               control={form.control}
               name="content"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="h-96 overflow-x-scroll">
                   <FormLabel>Content</FormLabel>
                   <FormControl>
                     <CKEditor
@@ -267,9 +262,7 @@ const HistoriesHome = () => {
         >
           Add History
         </Button>
-        {isFormOpen && (
-          <AddHistoryForm refetchFunc={historyRefetch} onClose={closeForm} />
-        )}
+        {isFormOpen && <AddHistoryForm onClose={closeForm} />}
       </div>
 
       <div className="rounded-md border">

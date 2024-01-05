@@ -9,13 +9,19 @@ export type KioskButtonPropType = {
   type?: "primary" | "secondary";
   Icon: PhosIcon;
   text: string;
+  btnNavType?: "next" | "prev";
   disabled?: boolean;
   className?: string;
 } & LinkType;
 
-const btnClasses = {
+export const btnClasses = {
   primary: "px-20 py-10 text-2xl",
   secondary: "bg-zinc-200 px-20 py-10 text-2xl text-gray-400",
+};
+
+export const btnNavClass = {
+  next: "next",
+  prev: "prev",
 };
 
 /* The Button will be used for Navigation.
@@ -34,6 +40,7 @@ const btnClasses = {
  *     text={"submit"}
  *     type={"primary"}
  *     Icon={Icon}
+ *     btnNavType={"next"}
  *     className={"text-black-100"}
  *  />
  *
@@ -43,12 +50,21 @@ const KioskButton = ({
   Icon,
   text,
   className,
+  btnNavType,
   disabled = false,
   ...props
 }: KioskButtonPropType) => {
   return (
     <Link {...props}>
-      <Button disabled={disabled} className={cn(btnClasses[type], className)}>
+      <Button
+        disabled={disabled}
+        className={cn(
+          btnClasses[type],
+          btnNavType && btnNavClass[btnNavType],
+          className,
+          "button",
+        )}
+      >
         <Icon
           size={24}
           color={type == "primary" ? "#fff" : "#bec2bf"}
