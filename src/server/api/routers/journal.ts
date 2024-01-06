@@ -1,5 +1,6 @@
 import {
   journalFormSchema,
+  searchByIdSchema,
   updateJournalFormSchema,
 } from "~/schemas/journalSchemas";
 
@@ -18,6 +19,15 @@ export const journalRouter = createTRPCRouter({
       },
     });
   }),
+
+  getById: publicProcedure.input(searchByIdSchema)
+    .query(({ ctx, input }) => {
+      return ctx.db.journal.findUnique({
+        where: {
+          id: input.id,
+        },
+      })
+    }),
 
   create: protectedProcedure
     .input(journalFormSchema)

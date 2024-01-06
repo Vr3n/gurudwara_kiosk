@@ -1,5 +1,6 @@
 import {
   historyFormSchema,
+  searchByIdSchema,
   updateHistoryFormSchema,
 } from "~/schemas/historySchemas";
 
@@ -18,6 +19,15 @@ export const historyRouter = createTRPCRouter({
       },
     });
   }),
+
+  getById: publicProcedure.input(searchByIdSchema)
+    .query(({ ctx, input }) => {
+      return ctx.db.history.findUnique({
+        where: {
+          id: input.id,
+        },
+      })
+    }),
 
   create: protectedProcedure
     .input(historyFormSchema)
