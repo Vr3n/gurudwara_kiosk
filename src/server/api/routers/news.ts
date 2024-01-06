@@ -1,4 +1,8 @@
-import { newsFormSchema, updateNewsFormSchema } from "~/schemas/newsSchemas";
+import {
+  newsFormSchema,
+  searchByIdSchema,
+  updateNewsFormSchema,
+} from "~/schemas/newsSchemas";
 
 import {
   createTRPCRouter,
@@ -12,6 +16,13 @@ export const newsRouter = createTRPCRouter({
       orderBy: { createdAt: "desc" },
       include: {
         gurudwara: true,
+      },
+    });
+  }),
+  getById: publicProcedure.input(searchByIdSchema).query(({ ctx, input }) => {
+    return ctx.db.news.findUnique({
+      where: {
+        id: input.id,
       },
     });
   }),

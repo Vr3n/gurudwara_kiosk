@@ -17,3 +17,7 @@ export const journalFormSchema = z.object({
 export const updateJournalFormSchema = journalFormSchema.extend({
   id: z.string().cuid(),
 });
+
+export const searchByIdSchema = z.object({
+  id: z.string({ required_error: "Journal Id not provided!" }),
+});

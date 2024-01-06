@@ -17,3 +17,7 @@ export const historyFormSchema = z.object({
 export const updateHistoryFormSchema = historyFormSchema.extend({
   id: z.string().cuid(),
 });
+
+export const searchByIdSchema = z.object({
+  id: z.string({ required_error: "history Id not provided!" }),
+});

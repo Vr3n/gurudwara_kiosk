@@ -155,30 +155,17 @@ const GurudwaraDetailPage = () => {
             <TabsContent value="journals" className="h-full">
               <div className=" flex h-[60rem] flex-col content-stretch justify-between gap-4 overflow-y-scroll">
                 {gurudwara?.journals.map((journal, i) => (
-                  <Dialog key={i}>
-                    <DialogTrigger asChild>
-                      <JournalCard
-                        journal={journal}
-                        className="h-full"
-                        gurudwara={gurudwara}
-                        activeJournal={activeJournal === i}
-                        onClick={() => setActiveJournal(i)}
-                      />
-                    </DialogTrigger>
-                    <DialogContent
-                      className={cn("font-sans", fontSans.variable)}
-                    >
-                      <DialogHeader>
-                        <DialogTitle>{journal.title}</DialogTitle>
-                        <DialogDescription>
-                          {journal.description}
-                        </DialogDescription>
-                      </DialogHeader>
-                      <RenderHtml
-                        html={journal?.content ?? "<p>Loading...</p>"}
-                      />
-                    </DialogContent>
-                  </Dialog>
+                  <JournalCard
+                    journal={journal}
+                    className="h-full"
+                    gurudwara={gurudwara}
+                    key={journal.id}
+                    activeJournal={activeJournal === i}
+                    onClick={async () => {
+                      setActiveJournal(i)
+                      await router.push(`/gurudwara/journal/${journal.id}`);
+                    }}
+                  />
                 ))}
               </div>
             </TabsContent>
@@ -200,30 +187,18 @@ const GurudwaraDetailPage = () => {
               <ScrollArea className="mt-4">
                 <div className=" flex h-[60rem] flex-col content-stretch gap-4 overflow-y-scroll">
                   {gurudwara?.news.map((news, i) => (
-                    <Dialog key={i}>
-                      <DialogTrigger asChild>
-                        <NewsCard
-                          news={news}
-                          gurudwara={gurudwara}
-                          className="h-full"
-                          activeNews={activeNews === i}
-                          onClick={() => setActiveNews(i)}
-                        />
-                      </DialogTrigger>
-                      <DialogContent
-                        className={cn("font-sans", fontSans.variable)}
-                      >
-                        <DialogHeader>
-                          <DialogTitle>{news.title}</DialogTitle>
-                          <DialogDescription>
-                            {news.description}
-                          </DialogDescription>
-                        </DialogHeader>
-                        <RenderHtml
-                          html={news?.content ?? "<p>Loading...</p>"}
-                        />
-                      </DialogContent>
-                    </Dialog>
+                    <NewsCard
+                      news={news}
+                      key={news.id}
+                      gurudwara={gurudwara}
+                      className="h-full"
+                      activeNews={activeNews === i}
+                      onClick={async () => {
+                        setActiveNews(i)
+
+                        await router.push(`/gurudwara/news/${news.id}`);
+                      }}
+                    />
                   ))}
                 </div>
                 <ScrollBar orientation="vertical" />
@@ -233,30 +208,17 @@ const GurudwaraDetailPage = () => {
               <ScrollArea className="mt-4 h-full">
                 <div className=" flex h-[60rem] flex-col content-stretch gap-4 overflow-y-scroll">
                   {gurudwara?.histories.map((history, i) => (
-                    <Dialog key={i}>
-                      <DialogTrigger asChild>
-                        <HistoryCard
-                          history={history}
-                          gurudwara={gurudwara}
-                          className="h-full"
-                          activeHistory={activeHistory === i}
-                          onClick={() => setActiveHistory(i)}
-                        />
-                      </DialogTrigger>
-                      <DialogContent
-                        className={cn("font-sans", fontSans.variable)}
-                      >
-                        <DialogHeader>
-                          <DialogTitle>{history.title}</DialogTitle>
-                          <DialogDescription>
-                            {history.description}
-                          </DialogDescription>
-                        </DialogHeader>
-                        <RenderHtml
-                          html={history?.content ?? "<p>Loading...</p>"}
-                        />
-                      </DialogContent>
-                    </Dialog>
+                    <HistoryCard
+                      history={history}
+                      gurudwara={gurudwara}
+                      key={history.id}
+                      className="h-full"
+                      activeHistory={activeHistory === i}
+                      onClick={async () => {
+                        setActiveHistory(i)
+                        await router.push(`/gurudwara/history/${history.id}`);
+                      }}
+                    />
                   ))}
                 </div>
                 <ScrollBar orientation="vertical" />
@@ -301,31 +263,3 @@ GurudwaraDetailPage.getLayout = (page: any) => (
 );
 
 export default GurudwaraDetailPage;
-{
-  /*
-              <ScrollArea className="mt-4">
-                <Swiper spaceBetween={5} slidesPerView={4}>
-                  {gurudwara?.images.map((image) => (
-                    <SwiperSlide key={image.id}>
-                      <figure className="shrink-0">
-                        <div className="overflow-hidden rounded-md">
-                          <Image
-                            className="border-zinc-200"
-                            src={image.url}
-                            height={600}
-                            width={600}
-                            alt="Photo"
-                          />
-                        </div>
-                      </figure>
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-                <ScrollBar
-                  className="h-6 rounded-md bg-zinc-600 transition-all delay-150"
-                  orientation="horizontal"
-                />
-              </ScrollArea>
-   *
-   * */
-}

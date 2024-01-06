@@ -17,3 +17,7 @@ export const newsFormSchema = z.object({
 export const updateNewsFormSchema = newsFormSchema.extend({
   id: z.string().cuid(),
 });
+
+export const searchByIdSchema = z.object({
+  id: z.string({ required_error: "News Id not provided!" }),
+});
