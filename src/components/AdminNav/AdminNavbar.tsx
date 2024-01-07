@@ -12,6 +12,7 @@ import { Toggle } from "~/components/ui/toggle";
 import { fontSans } from "~/layouts/AdminBaseLayout";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import type { Session } from "next-auth";
+import { signOut } from "next-auth/react";
 
 type AdminNavbarProps = {
   sidebarToggleFunc: () => void;
@@ -56,7 +57,9 @@ const AdminNavbar = ({ sidebarToggleFunc, session }: AdminNavbarProps) => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-lg">Profile</DropdownMenuItem>
-            <DropdownMenuItem className="text-lg">Logout</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => signOut()} className="text-lg">
+              Logout
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </section>
